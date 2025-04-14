@@ -1,10 +1,11 @@
-use iced::widget::{
-	Row,
-	markdown::{self, Item},
-	row, text_editor,
-};
+use std::error::Error;
 
-#[derive(Default)]
+use app::{App, flags::Flags};
+use cosmic::app::Settings;
+
+mod app;
+
+/* #[derive(Default)]
 struct App {
 	text: text_editor::Content,
 	md: Vec<Item>,
@@ -49,4 +50,13 @@ impl App {
 
 fn main() -> iced::Result {
 	iced::run("EstroMD", App::update, App::view)
+}
+ */
+
+fn main() -> Result<(), Box<dyn Error>> {
+	let settings = Settings::default();
+	let flags = Flags::new();
+
+	cosmic::app::run::<App>(settings, flags)?;
+	Ok(())
 }
