@@ -1,13 +1,9 @@
+use std::u16;
+
 use cosmic::{
-	Application, Core, 
-	app::Task, 
-	executor,
-	iced::theme::Palette,
-	iced_widget::row,
-	widget::{
-		markdown::{self, Item},
-		text_editor,
-	},
+	app::Task, executor, iced::theme::Palette, iced_widget::row, widget::{
+		horizontal_space, markdown::{self, Item}, text_editor
+	}, Application, Core, Element
 };
 use flags::Flags;
 use message::Message;
@@ -17,6 +13,8 @@ pub mod message;
 
 pub struct App {
 	core: Core,
+	#[allow(unused)]
+	flags: Flags,
 
 	text: text_editor::Content,
 	md: Vec<Item>,
@@ -40,25 +38,29 @@ impl Application for App {
 	fn init(core: Core, flags: Self::Flags) -> (Self, Task<Self::Message>) {
 		let app = Self {
 			core,
+			flags,
 
 			text: text_editor::Content::default(),
 			md: vec![],
 		};
 
-		#[allow(unused)]
-		let flags = flags;
-
 		(app, Task::none())
 	}
 
-	fn view(&self) -> cosmic::Element<Self::Message> {
+	fn view(&self) -> Element<Self::Message> {
+		const TEXT_SIZE: f32 = 14.; // TODO: make configurable
+
 		row![
 			text_editor(&self.text)
 				.placeholder("Type here")
+				.height(u16::MAX) // I doubt monitors will get that large anytime soon
+				.size(TEXT_SIZE)
 				.on_action(Message::Edit),
+			horizontal_space()
+				.width(TEXT_SIZE * 2.),
 			markdown::view(
 				self.md.iter(),
-				markdown::Settings::default(),
+				markdown::Settings::with_text_size(TEXT_SIZE),
 				markdown::Style::from_palette(Palette::CATPPUCCIN_FRAPPE)
 			)
 			.map(Message::Url)
