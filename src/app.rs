@@ -1,12 +1,20 @@
 use std::u16;
 
 use cosmic::{
-	app::Task, executor, iced::theme::Palette, iced_widget::row, widget::{
-		horizontal_space, markdown::{self, Item}, text_editor
-	}, Application, Core, Element
+	Application, Core, Element,
+	app::Task,
+	executor,
+	iced::theme::Palette,
+	iced_widget::row,
+	widget::{
+		horizontal_space,
+		markdown::{self, Item},
+		text_editor,
+	},
 };
 use flags::Flags;
 use message::Message;
+use tracing::{info, warn};
 
 pub mod flags;
 pub mod message;
@@ -53,8 +61,7 @@ impl Application for App {
 				.height(u16::MAX) // I doubt monitors will get that large anytime soon
 				.size(self.flags.text_size)
 				.on_action(Message::Edit),
-			horizontal_space()
-				.width(self.flags.text_size * 2.),
+			horizontal_space().width(self.flags.text_size * 2.),
 			markdown::view(
 				self.md.iter(),
 				markdown::Settings::with_text_size(self.flags.text_size),
@@ -69,10 +76,10 @@ impl Application for App {
 		match message {
 			Message::Edit(action) => self.text.perform(action),
 			Message::Url(url) => {
-				println!("opening {}", url.as_str());
+				info!("Opening {}", url.as_str());
 
 				if let Err(e) = open::that(url.as_str()) {
-					println!("{e}")
+					warn!("{e}")
 				}
 			}
 		}

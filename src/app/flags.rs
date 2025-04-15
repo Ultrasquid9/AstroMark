@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct Flags {
-	pub text_size: f32
+	pub text_size: f32,
 }
 
 impl Flags {
@@ -13,8 +13,6 @@ impl Flags {
 
 impl Default for Flags {
 	fn default() -> Self {
-		Self { 
-			text_size: 14.
-		}
+		Self { text_size: 14. }
 	}
 }
