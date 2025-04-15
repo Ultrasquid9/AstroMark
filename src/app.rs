@@ -13,7 +13,6 @@ pub mod message;
 
 pub struct App {
 	core: Core,
-	#[allow(unused)]
 	flags: Flags,
 
 	text: text_editor::Content,
@@ -48,19 +47,17 @@ impl Application for App {
 	}
 
 	fn view(&self) -> Element<Self::Message> {
-		const TEXT_SIZE: f32 = 14.; // TODO: make configurable
-
 		row![
 			text_editor(&self.text)
 				.placeholder("Type here")
 				.height(u16::MAX) // I doubt monitors will get that large anytime soon
-				.size(TEXT_SIZE)
+				.size(self.flags.text_size)
 				.on_action(Message::Edit),
 			horizontal_space()
-				.width(TEXT_SIZE * 2.),
+				.width(self.flags.text_size * 2.),
 			markdown::view(
 				self.md.iter(),
-				markdown::Settings::with_text_size(TEXT_SIZE),
+				markdown::Settings::with_text_size(self.flags.text_size),
 				markdown::Style::from_palette(Palette::CATPPUCCIN_FRAPPE)
 			)
 			.map(Message::Url)
