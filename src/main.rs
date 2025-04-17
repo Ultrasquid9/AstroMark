@@ -10,8 +10,11 @@ pub type AppResult<Ok> = Result<Ok, Box<dyn Error + Send + Sync>>;
 
 fn main() -> AppResult<()> {
 	init::log()?;
-	let flags = init::args()?;
+	let args = init::args();
 
-	cosmic::app::run::<App>(Settings::default(), flags)?;
+	let settings = Settings::default();
+	let flags = init::flags(&args);
+
+	cosmic::app::run::<App>(settings, flags)?;
 	Ok(())
 }

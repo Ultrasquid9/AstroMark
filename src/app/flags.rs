@@ -1,4 +1,8 @@
+use std::{fs, path::PathBuf};
+
+use ron::ser::PrettyConfig;
 use serde::{Deserialize, Serialize};
+use tracing::error;
 
 #[derive(Serialize, Deserialize)]
 pub struct Flags {
@@ -6,8 +10,25 @@ pub struct Flags {
 }
 
 impl Flags {
-	pub fn new() -> Self {
-		Self::default()
+	pub fn read(path: &PathBuf) -> Self {
+		match fs::read_to_string(path) {
+			Ok(str) => match ron::from_str(&str) {
+				Ok(flags) => flags,
+				Err(e) => {
+					error!("Error deserializing config: {e}");
+					Self::default()
+				}
+			},
+			Err(e) => {
+				error!("Error reading config: {e}");
+				Self::default()
+			}
+		}
+	}
+
+	pub fn default_str() -> String {
+		let cfg = PrettyConfig::default().indentor("	");
+		ron::ser::to_string_pretty(&Self::default(), cfg).expect("Default should be serializable")
 	}
 }
 

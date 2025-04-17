@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 clap = "4.5"
+dirs = "6"
 open = "5.3"
 ron = "0.10"
 serde = "1"
