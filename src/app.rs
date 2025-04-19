@@ -7,19 +7,22 @@ pub mod flags;
 pub mod message;
 pub mod state;
 
-pub struct App {
+// TODO - Translations 
+const APP_TITLE: &str = "AstroMark";
+
+pub struct AstroMark {
 	core: Core,
 	flags: Flags,
 
 	state: State,
 }
 
-impl Application for App {
+impl Application for AstroMark {
 	type Executor = executor::Default;
 	type Message = Message;
 	type Flags = Flags;
 
-	const APP_ID: &'static str = "uwu.juni.estromd";
+	const APP_ID: &'static str = "uwu.juni.astromark";
 
 	fn core(&self) -> &Core {
 		&self.core
@@ -37,8 +40,9 @@ impl Application for App {
 			state: State::new(),
 		};
 
-		let tasks = [app.set_window_title("EstroMD".into())];
+		let tasks = [app.set_window_title(APP_TITLE.into())];
 
+		app.update_header_title();
 		(app, Task::batch(tasks))
 	}
 
@@ -47,6 +51,13 @@ impl Application for App {
 	}
 
 	fn update(&mut self, message: Self::Message) -> Task<Self::Message> {
+		self.update_header_title();
 		self.state.update(message)
+	}
+}
+
+impl AstroMark {
+	fn update_header_title(&mut self) {
+		self.set_header_title(format!("{APP_TITLE} - {}", self.state));
 	}
 }

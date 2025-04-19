@@ -1,7 +1,6 @@
 use std::error::Error;
 
-use app::App;
-use cosmic::app::Settings;
+use cosmic::app::{Settings, run};
 
 mod app;
 mod init;
@@ -15,6 +14,6 @@ fn main() -> AppResult<()> {
 	let settings = Settings::default();
 	let flags = init::flags(&args);
 
-	cosmic::app::run::<App>(settings, flags)?;
+	run::<app::AstroMark>(settings, flags)?;
 	Ok(())
 }

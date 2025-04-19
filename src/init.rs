@@ -10,9 +10,9 @@ use tracing::{Level, error, info};
 use crate::{AppResult, app::flags::Flags};
 
 pub fn args() -> ArgMatches {
-	Command::new("EstroMD")
+	Command::new("AstroMark")
 		.version("0")
-		.about("Super simple markdown editor")
+		.about("Super simple graphical markdown editor")
 		.arg(
 			arg!(-c --config <FILE> "Use a custom config file")
 				.value_parser(value_parser!(PathBuf)),
@@ -52,7 +52,7 @@ fn get_or_create_cfg_dir() -> PathBuf {
 		panic!()
 	};
 
-	dir.push("estro_md");
+	dir.push("astromark");
 	dir_exists_or_run(&dir, fs::create_dir_all);
 
 	dir.push("config.ron");

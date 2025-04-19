@@ -235,6 +235,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "astromark"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "dirs 6.0.0",
+ "libcosmic",
+ "open",
+ "ron 0.10.1",
+ "serde",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "atomic-waker"
 version = "1.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1034,20 +1048,6 @@ name = "error-code"
 version = "3.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a5d9305ccc6942a704f4335694ecd3de2ea531b114ac2d51f5f843750787a92f"
-
-[[package]]
-name = "estromd"
-version = "0.1.0"
-dependencies = [
- "clap",
- "dirs 6.0.0",
- "libcosmic",
- "open",
- "ron 0.10.1",
- "serde",
- "tracing",
- "tracing-subscriber",
-]
 
 [[package]]
 name = "etagere"
