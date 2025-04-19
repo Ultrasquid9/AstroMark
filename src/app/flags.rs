@@ -7,6 +7,7 @@ use tracing::error;
 #[derive(Serialize, Deserialize)]
 pub struct Flags {
 	pub text_size: f32,
+	pub tab_len: usize,
 }
 
 impl Flags {
@@ -34,6 +35,9 @@ impl Flags {
 
 impl Default for Flags {
 	fn default() -> Self {
-		Self { text_size: 14. }
+		Self {
+			text_size: 14.,
+			tab_len: 4,
+		}
 	}
 }

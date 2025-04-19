@@ -4,7 +4,7 @@ use std::{
 	path::{Path, PathBuf},
 };
 
-use clap::{ArgAction, ArgMatches, Command, value_parser};
+use clap::{ArgAction, ArgMatches, Command, arg, value_parser};
 use tracing::{Level, error, info};
 
 use crate::{AppResult, app::flags::Flags};
@@ -14,11 +14,10 @@ pub fn args() -> ArgMatches {
 		.version("0")
 		.about("Super simple markdown editor")
 		.arg(
-			clap::arg!(-c --config <FILE> "Use a custom config file")
-				//.required(false)
+			arg!(-c --config <FILE> "Use a custom config file")
 				.value_parser(value_parser!(PathBuf)),
 		)
-		.arg(clap::arg!(-r --reset_config ... "Reset the config file").action(ArgAction::SetTrue))
+		.arg(arg!(-r --reset_config ... "Reset the config file").action(ArgAction::SetTrue))
 		.get_matches()
 }
 
@@ -66,10 +65,10 @@ fn get_or_create_cfg_dir() -> PathBuf {
 }
 
 /// Checks if a directory exists. If it does not, runs the provided function and handles any errors.
-fn dir_exists_or_run<Pat, Fun, Err, Idk>(dir: Pat, fun: Fun)
+fn dir_exists_or_run<Dir, Fun, Err, Idk>(dir: Dir, fun: Fun)
 where
-	Pat: AsRef<Path>,
-	Fun: Fn(Pat) -> Result<Idk, Err>,
+	Dir: AsRef<Path>,
+	Fun: Fn(Dir) -> Result<Idk, Err>,
 	Err: Error,
 {
 	// TODO: Replace with let-chain once stabilized

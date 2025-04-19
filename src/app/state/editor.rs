@@ -1,6 +1,10 @@
 use cosmic::{
-	Element, Task,
-	iced::theme::Palette,
+	Element,
+	app::Task,
+	iced::{
+		keyboard::{self, key::Named},
+		theme::Palette,
+	},
 	iced_widget::row,
 	widget::{
 		horizontal_space,
@@ -25,9 +29,10 @@ impl Editor {
 		}
 	}
 
-	pub fn view(&self, flags: &Flags) -> Element<Message> {
+	pub fn view<'flags>(&'flags self, flags: &'flags Flags) -> Element<'flags, Message> {
 		row![
 			text_editor(&self.text)
+				.key_binding(|kp| key_bindings(kp, flags))
 				.placeholder("Type here")
 				.height(u16::MAX) // I doubt monitors will get that large anytime soon
 				.size(flags.text_size)
@@ -43,7 +48,7 @@ impl Editor {
 		.into()
 	}
 
-	pub fn update(&mut self, message: Message) -> cosmic::app::Task<Message> {
+	pub fn update(&mut self, message: Message) -> Task<Message> {
 		match message {
 			Message::Edit(action) => self.text.perform(action),
 			Message::Url(url) => {
@@ -54,12 +59,30 @@ impl Editor {
 				}
 			}
 
+			// Will be used in the future
 			#[allow(unreachable_patterns)]
 			_ => (),
 		}
 
+		// TODO: Make async  
 		self.md = markdown::parse(&self.text.text()).collect();
 
 		Task::none()
+	}
+}
+
+fn key_bindings(kp: text_editor::KeyPress, flags: &Flags) -> Option<text_editor::Binding<Message>> {
+	// TODO: Custom bindings; Vim/Helix motions maybe?
+	// Lua/Rhai config would be epic 
+
+	if let keyboard::Key::Named(Named::Tab) = kp.key {
+		// Tabs
+		// TODO: Find some way to use hard tabs instead of spaces
+		Some(text_editor::Binding::Sequence(
+			vec![text_editor::Binding::Insert(' '); flags.tab_len],
+		))
+	} else {
+		// Default bindings
+		text_editor::Binding::from_key_press(kp)
 	}
 }
