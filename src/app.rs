@@ -7,7 +7,7 @@ pub mod flags;
 pub mod message;
 pub mod state;
 
-// TODO - Translations 
+// TODO - Translations
 const APP_TITLE: &str = "AstroMark";
 
 pub struct AstroMark {

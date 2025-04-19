@@ -1,0 +1,9 @@
+# Probably Temporary
+[Desktop Entry]
+Type=Application
+Name=AstroMark
+Exec=astromark
+Terminal=false
+Icon=uwu.juni.astromark
+Categories=COSMIC;Utility;TextEditor;
+Keywords=Text;Editor;Markdown;

@@ -64,7 +64,7 @@ impl Editor {
 			_ => (),
 		}
 
-		// TODO: Make async  
+		// TODO: Make async
 		self.md = markdown::parse(&self.text.text()).collect();
 
 		Task::none()
@@ -73,7 +73,7 @@ impl Editor {
 
 fn key_bindings(kp: text_editor::KeyPress, flags: &Flags) -> Option<text_editor::Binding<Message>> {
 	// TODO: Custom bindings; Vim/Helix motions maybe?
-	// Lua/Rhai config would be epic 
+	// Lua/Rhai config would be epic
 
 	if let keyboard::Key::Named(Named::Tab) = kp.key {
 		// Tabs

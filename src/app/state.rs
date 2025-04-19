@@ -31,7 +31,7 @@ impl State {
 impl Display for State {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		match self {
-			State::Editor(_) => f.write_str("Editor")
+			State::Editor(_) => f.write_str("Editor"),
 		}
 	}
 }
