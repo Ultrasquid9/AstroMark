@@ -3,12 +3,11 @@ use flags::Flags;
 use message::Message;
 use state::State;
 
+use crate::trans;
+
 pub mod flags;
 pub mod message;
 pub mod state;
-
-// TODO - Translations
-const APP_TITLE: &str = "AstroMark";
 
 pub struct AstroMark {
 	core: Core,
@@ -40,7 +39,7 @@ impl Application for AstroMark {
 			state: State::new(),
 		};
 
-		let tasks = [app.set_window_title(APP_TITLE.into())];
+		let tasks = [app.set_window_title(trans!("astromark"))];
 
 		app.update_header_title();
 		(app, Task::batch(tasks))
@@ -58,6 +57,6 @@ impl Application for AstroMark {
 
 impl AstroMark {
 	fn update_header_title(&mut self) {
-		self.set_header_title(format!("{APP_TITLE} - {}", self.state));
+		self.set_header_title(format!("{} - {}", trans!("astromark"), self.state));
 	}
 }

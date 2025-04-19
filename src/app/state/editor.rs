@@ -14,9 +14,10 @@ use cosmic::{
 };
 use tracing::{info, warn};
 
-use crate::app::{flags::Flags, message::Message};
+use crate::{app::{flags::Flags, message::Message}, trans};
 
 pub struct Editor {
+	default_text: String,
 	text: text_editor::Content,
 	md: Vec<Item>,
 }
@@ -24,6 +25,7 @@ pub struct Editor {
 impl Editor {
 	pub fn new() -> Self {
 		Self {
+			default_text: trans!("default_text"),
 			text: text_editor::Content::default(),
 			md: vec![],
 		}
@@ -33,7 +35,7 @@ impl Editor {
 		row![
 			text_editor(&self.text)
 				.key_binding(|kp| key_bindings(kp, flags))
-				.placeholder("Type here")
+				.placeholder(&self.default_text)
 				.height(u16::MAX) // I doubt monitors will get that large anytime soon
 				.size(flags.text_size)
 				.on_action(Message::Edit),

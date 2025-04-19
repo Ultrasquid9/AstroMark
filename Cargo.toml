@@ -7,8 +7,18 @@ edition = "2024"
 clap = "4.5"
 dirs = "6"
 open = "5.3"
+
+# (de)serialization
 ron = "0.10"
 serde = "1"
+
+# Translations
+i18n-embed-fl = "0.9"
+i18n-embed = { version = "0.15", features = ["fluent-system", "desktop-requester"]}
+rust-embed = "8"
+unic-langid = "0.9"
+
+# Logging 
 tracing = "0.1"
 tracing-subscriber = "0.3"
 
