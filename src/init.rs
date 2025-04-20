@@ -72,11 +72,9 @@ where
 	Err: Error,
 {
 	// TODO: Replace with let-chain once stabilized
-	if let Ok(exists) = fs::exists(&dir) {
-		if !exists {
-			if let Err(e) = fun(dir) {
-				error!("{e}")
-			}
+	if matches!(fs::exists(&dir), Ok(exists) if !exists) {
+		if let Err(e) = fun(dir) {
+			error!("{e}")
 		}
 	}
 }

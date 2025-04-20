@@ -1,7 +1,11 @@
-use cosmic::{Application, ApplicationExt, Core, Element, app::Task, executor, iced::window::Id};
+use std::collections::HashMap;
+
+use cosmic::{
+	app::Task, executor, iced::window::Id, widget::menu::{self, Item, ItemHeight}, Application, ApplicationExt, Core, Element
+};
 use dialog::DialogManager;
 use flags::Flags;
-use message::Message;
+use message::{MenuActions, Message};
 use state::{Screen, State};
 use tracing::error;
 
@@ -55,6 +59,10 @@ impl Application for AstroMark {
 		(app, Task::batch(tasks))
 	}
 
+	fn header_start(&self) -> Vec<Element<Self::Message>> {
+		vec![menu_bar()]
+	}
+
 	fn view(&self) -> Element<Self::Message> {
 		self.state.view(&self.flags)
 	}
@@ -78,4 +86,25 @@ impl AstroMark {
 	fn update_header_title(&mut self) {
 		self.set_header_title(format!("{} - {}", trans!("astromark"), self.state));
 	}
+}
+
+fn menu_bar<'thing>() -> Element<'thing, Message> {
+	let keybinds: HashMap<menu::KeyBind, MenuActions> = HashMap::new();
+
+	menu::bar(vec![menu::Tree::with_children(
+		menu::root(trans!("file")),
+		menu::items(
+			&keybinds,
+			vec![
+				Item::Button(trans!("save"), None, MenuActions::Save),
+				Item::Divider,
+				Item::Button(trans!("open_file"), None, MenuActions::OpenFile),
+				Item::Button(trans!("new_file"), None, MenuActions::NewFile),
+				Item::Divider,
+				Item::Button(trans!("go_home"), None, MenuActions::GoHome),
+			],
+		),
+	)])
+	.item_height(ItemHeight::Dynamic(40))
+	.into()
 }

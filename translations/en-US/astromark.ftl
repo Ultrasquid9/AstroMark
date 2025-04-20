@@ -6,3 +6,7 @@ default_text = Type Here
 
 open_file = Open File
 new_file = New File 
+
+file = File
+save = Save
+go_home = Go Home

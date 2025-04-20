@@ -46,6 +46,7 @@ impl Screen for State {
 	) -> Task<Message> {
 		match &message {
 			Message::OpenEditor(path) => *self = Self::Editor(editor::Editor::new(path.clone())),
+			Message::OpenHome => *self = Self::Home(home::Home::new()),
 
 			_ => (),
 		}
