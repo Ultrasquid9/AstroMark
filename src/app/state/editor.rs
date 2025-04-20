@@ -14,7 +14,12 @@ use cosmic::{
 };
 use tracing::{info, warn};
 
-use crate::{app::{flags::Flags, message::Message}, trans};
+use crate::{
+	app::{flags::Flags, message::Message},
+	trans,
+};
+
+use super::Screen;
 
 pub struct Editor {
 	default_text: String,
@@ -30,8 +35,10 @@ impl Editor {
 			md: vec![],
 		}
 	}
+}
 
-	pub fn view<'flags>(&'flags self, flags: &'flags Flags) -> Element<'flags, Message> {
+impl Screen for Editor {
+	fn view<'flags>(&'flags self, flags: &'flags Flags) -> Element<'flags, Message> {
 		row![
 			text_editor(&self.text)
 				.key_binding(|kp| key_bindings(kp, flags))
@@ -50,7 +57,7 @@ impl Editor {
 		.into()
 	}
 
-	pub fn update(&mut self, message: Message) -> Task<Message> {
+	fn update<'flags>(&'flags mut self, _: &'flags mut Flags, message: Message) -> Task<Message> {
 		match message {
 			Message::Edit(action) => self.text.perform(action),
 			Message::Url(url) => {

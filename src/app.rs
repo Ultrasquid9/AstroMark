@@ -1,7 +1,8 @@
 use cosmic::{Application, ApplicationExt, Core, Element, app::Task, executor};
 use flags::Flags;
 use message::Message;
-use state::State;
+use state::{Screen, State};
+use tracing::error;
 
 use crate::trans;
 
@@ -39,7 +40,12 @@ impl Application for AstroMark {
 			state: State::new(),
 		};
 
-		let tasks = [app.set_window_title(trans!("astromark"))];
+		let Some(id) = app.core.main_window_id() else {
+			error!("App window ID not found!");
+			panic!()
+		};
+
+		let tasks = [app.set_window_title(trans!("astromark"), id)];
 
 		app.update_header_title();
 		(app, Task::batch(tasks))
@@ -51,7 +57,7 @@ impl Application for AstroMark {
 
 	fn update(&mut self, message: Self::Message) -> Task<Self::Message> {
 		self.update_header_title();
-		self.state.update(message)
+		self.state.update(&mut self.flags, message)
 	}
 }
 

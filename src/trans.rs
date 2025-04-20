@@ -1,6 +1,9 @@
 use std::sync::OnceLock;
 
-use i18n_embed::{fluent::{fluent_language_loader, FluentLanguageLoader}, DesktopLanguageRequester, LanguageLoader};
+use i18n_embed::{
+	DesktopLanguageRequester, LanguageLoader,
+	fluent::{FluentLanguageLoader, fluent_language_loader},
+};
 
 use crate::AppResult;
 
