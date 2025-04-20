@@ -1,6 +1,6 @@
-use cosmic::app::Task;
+use cosmic::{app::Task, iced_widget::column, Element};
 
-use crate::app::{flags::Flags, message::Message};
+use crate::{app::{flags::Flags, message::Message}, trans};
 
 use super::Screen;
 
@@ -14,10 +14,14 @@ impl Home {
 }
 
 impl Screen for Home {
-	fn view<'flags>(&'flags self, _flags: &'flags Flags) -> cosmic::Element<'flags, Message> {
-		cosmic::widget::button::text("label")
-			.on_press(Message::OpenFilePicker)
-			.into()
+	fn view<'flags>(&'flags self, _flags: &'flags Flags) -> Element<'flags, Message> {
+		column![
+			cosmic::widget::button::text(trans!("open_file"))
+				.on_press(Message::OpenFilePicker),
+			cosmic::widget::button::text(trans!("new_file"))
+				.on_press(Message::OpenEditor(None)),
+		]
+		.into()
 	}
 
 	fn update<'flags>(

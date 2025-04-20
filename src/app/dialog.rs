@@ -1,6 +1,6 @@
-use cosmic::{Element, app::Task, widget};
+use cosmic::{Action, Element, app::Task, widget};
 use cosmic_files::dialog::{Dialog, DialogResult};
-use tracing::info;
+use tracing::{info, warn};
 
 use super::message::Message;
 
@@ -21,6 +21,8 @@ impl DialogManager {
 	}
 
 	pub fn update(&mut self, message: &Message) -> Option<Task<Message>> {
+		let task_none = Some(Task::none());
+
 		match message {
 			Message::OpenFilePicker if self.0.is_none() => {
 				let (dialog, task) = Dialog::new(
@@ -31,30 +33,33 @@ impl DialogManager {
 				);
 
 				self.0 = Some(dialog);
-				return Some(task);
+				Some(task)
 			}
 
 			Message::DialogMessage(dialog_message) => {
 				if let Some(dialog) = &mut self.0 {
-					return Some(dialog.update(dialog_message.clone()));
+					Some(dialog.update(dialog_message.clone()))
+				} else {
+					task_none
 				}
-
-				return Some(Task::none());
 			}
 
-			Message::OpenFileResult(result) => {
+			Message::OpenFileResult(DialogResult::Open(paths)) => {
+				let Some(path) = paths.first() else {
+					warn!("No paths selected!");
+					return task_none;
+				};
+
+				info!("File {:?} selected", path);
+
+				let message = Message::OpenEditor(Some(path.clone()));
+				Some(Task::done(Action::App(message)))
+			}
+
+			_ => {
 				self.0 = None;
-
-				if let DialogResult::Open(paths) = result {
-					for p in paths {
-						info!("{:?}", p)
-					}
-				}
-
-				return Some(Task::none());
+				None
 			}
-
-			_ => None,
 		}
 	}
 }

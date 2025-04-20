@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use cosmic::widget::{markdown, text_editor};
 use cosmic_files::dialog::{DialogMessage, DialogResult};
 
@@ -9,4 +11,6 @@ pub enum Message {
 	OpenFilePicker,
 	DialogMessage(DialogMessage),
 	OpenFileResult(DialogResult),
+
+	OpenEditor(Option<PathBuf>),
 }

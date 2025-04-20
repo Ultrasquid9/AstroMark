@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use cosmic::{
 	Element,
 	app::Task,
@@ -12,7 +14,7 @@ use cosmic::{
 		text_editor,
 	},
 };
-use tracing::{info, warn};
+use tracing::{error, info, warn};
 
 use crate::{
 	app::{flags::Flags, message::Message},
@@ -22,16 +24,31 @@ use crate::{
 use super::Screen;
 
 pub struct Editor {
+	path: Option<PathBuf>,
 	default_text: String,
 	text: text_editor::Content,
 	md: Vec<Item>,
 }
 
 impl Editor {
-	pub fn new() -> Self {
+	pub fn new(path: Option<PathBuf>) -> Self {
+		let text = if let Some(path) = &path {
+			let str = match std::fs::read_to_string(path) {
+				Ok(str) => str,
+				Err(e) => {
+					error!("File could not be read: {e}");
+					"".into()
+				}
+			};
+			text_editor::Content::with_text(&str)
+		} else {
+			text_editor::Content::new()
+		};
+
 		Self {
+			path,
 			default_text: trans!("default_text"),
-			text: text_editor::Content::default(),
+			text,
 			md: vec![],
 		}
 	}
@@ -68,8 +85,6 @@ impl Screen for Editor {
 				}
 			}
 
-			// Will be used in the future
-			#[allow(unreachable_patterns)]
 			_ => (),
 		}
 

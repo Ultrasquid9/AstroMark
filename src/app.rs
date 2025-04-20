@@ -1,4 +1,4 @@
-use cosmic::{app::Task, executor, iced::window::Id, Application, ApplicationExt, Core, Element};
+use cosmic::{Application, ApplicationExt, Core, Element, app::Task, executor, iced::window::Id};
 use dialog::DialogManager;
 use flags::Flags;
 use message::Message;
@@ -64,11 +64,12 @@ impl Application for AstroMark {
 	}
 
 	fn update(&mut self, message: Self::Message) -> Task<Self::Message> {
+		self.update_header_title();
+
 		if let Some(task) = self.dialog.update(&message) {
-			return task
+			return task;
 		}
 
-		self.update_header_title();
 		self.state.update(&mut self.flags, message)
 	}
 }

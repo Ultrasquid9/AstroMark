@@ -44,6 +44,12 @@ impl Screen for State {
 		flags: &'flags mut Flags,
 		message: Message,
 	) -> Task<Message> {
+		match &message {
+			Message::OpenEditor(path) => *self = Self::Editor(editor::Editor::new(path.clone())),
+
+			_ => (),
+		}
+
 		let screen: &mut dyn Screen = match self {
 			Self::Editor(editor) => editor,
 			Self::Home(home) => home,
