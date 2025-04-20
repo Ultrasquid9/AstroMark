@@ -26,7 +26,7 @@ pub enum State {
 
 impl State {
 	pub fn new() -> Self {
-		Self::Home(home::Home {})
+		Self::Home(home::Home::new())
 	}
 }
 

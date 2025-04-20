@@ -1,4 +1,5 @@
-use cosmic::{Application, ApplicationExt, Core, Element, app::Task, executor};
+use cosmic::{app::Task, executor, iced::window::Id, Application, ApplicationExt, Core, Element};
+use dialog::DialogManager;
 use flags::Flags;
 use message::Message;
 use state::{Screen, State};
@@ -6,6 +7,7 @@ use tracing::error;
 
 use crate::trans;
 
+pub mod dialog;
 pub mod flags;
 pub mod message;
 pub mod state;
@@ -14,6 +16,7 @@ pub struct AstroMark {
 	core: Core,
 	flags: Flags,
 
+	dialog: DialogManager,
 	state: State,
 }
 
@@ -37,6 +40,7 @@ impl Application for AstroMark {
 			core,
 			flags,
 
+			dialog: DialogManager::new(),
 			state: State::new(),
 		};
 
@@ -55,7 +59,15 @@ impl Application for AstroMark {
 		self.state.view(&self.flags)
 	}
 
+	fn view_window(&self, id: Id) -> Element<Self::Message> {
+		self.dialog.view_window(id)
+	}
+
 	fn update(&mut self, message: Self::Message) -> Task<Self::Message> {
+		if let Some(task) = self.dialog.update(&message) {
+			return task
+		}
+
 		self.update_header_title();
 		self.state.update(&mut self.flags, message)
 	}

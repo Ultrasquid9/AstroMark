@@ -1,4 +1,6 @@
-use cosmic::{app::Task, iced_widget::row};
+use cosmic::app::Task;
+
+use crate::app::{flags::Flags, message::Message};
 
 use super::Screen;
 
@@ -12,20 +14,17 @@ impl Home {
 }
 
 impl Screen for Home {
-	fn view<'flags>(
-		&'flags self,
-		_flags: &'flags crate::app::flags::Flags,
-	) -> cosmic::Element<'flags, crate::app::message::Message> {
-		row![].into()
+	fn view<'flags>(&'flags self, _flags: &'flags Flags) -> cosmic::Element<'flags, Message> {
+		cosmic::widget::button::text("label")
+			.on_press(Message::OpenFilePicker)
+			.into()
 	}
 
 	fn update<'flags>(
 		&'flags mut self,
-		_flags: &'flags mut crate::app::flags::Flags,
-		_message: crate::app::message::Message,
-	) -> Task<crate::app::message::Message> {
-		//Dialog::n
-
+		_flags: &'flags mut Flags,
+		_message: Message,
+	) -> Task<Message> {
 		Task::none()
 	}
 }
