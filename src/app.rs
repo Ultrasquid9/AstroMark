@@ -64,7 +64,7 @@ impl Application for AstroMark {
 	}
 
 	fn header_start(&self) -> Vec<Element<Self::Message>> {
-		vec![menu_bar()]
+		vec![self.menu_bar()]
 	}
 
 	fn view(&self) -> Element<Self::Message> {
@@ -92,23 +92,30 @@ impl AstroMark {
 	}
 }
 
-fn menu_bar<'thing>() -> Element<'thing, Message> {
-	let keybinds: HashMap<menu::KeyBind, MenuActions> = HashMap::new();
+impl AstroMark {
+	fn menu_bar<'thing>(&self) -> Element<'thing, Message> {
+		let keybinds: HashMap<menu::KeyBind, MenuActions> = HashMap::new();
 
-	menu::bar(vec![menu::Tree::with_children(
-		menu::root(trans!("file")),
-		menu::items(
-			&keybinds,
-			vec![
+		let mut file_menu = vec![];
+		if let State::Editor(_) = self.state {
+			file_menu.append(&mut vec![
 				Item::Button(trans!("save"), None, MenuActions::Save),
+				Item::Button(trans!("save_as"), None, MenuActions::SaveAs),
 				Item::Divider,
-				Item::Button(trans!("open_file"), None, MenuActions::OpenFile),
-				Item::Button(trans!("new_file"), None, MenuActions::NewFile),
-				Item::Divider,
-				Item::Button(trans!("go_home"), None, MenuActions::GoHome),
-			],
-		),
-	)])
-	.item_height(ItemHeight::Dynamic(40))
-	.into()
+			]);
+		}
+		file_menu.append(&mut vec![
+			Item::Button(trans!("open_file"), None, MenuActions::OpenFile),
+			Item::Button(trans!("new_file"), None, MenuActions::NewFile),
+			Item::Divider,
+			Item::Button(trans!("go_home"), None, MenuActions::GoHome),
+		]);
+
+		menu::bar(vec![menu::Tree::with_children(
+			menu::root(trans!("file")),
+			menu::items(&keybinds, file_menu),
+		)])
+		.item_height(ItemHeight::Dynamic(40))
+		.into()
+	}
 }

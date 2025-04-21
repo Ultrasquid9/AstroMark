@@ -17,7 +17,10 @@ use cosmic::{
 use tracing::{error, info, warn};
 
 use crate::{
-	app::{flags::Flags, message::Message},
+	app::{
+		flags::Flags,
+		message::{Message, task},
+	},
 	trans,
 };
 
@@ -76,14 +79,21 @@ impl Screen for Editor {
 
 	fn update<'flags>(&'flags mut self, _: &'flags mut Flags, message: Message) -> Task<Message> {
 		match message {
-			Message::Save if self.path.is_some() => {
-				let path = self.path.clone().expect("Path is known to exist");
+			Message::Save => {
+				let Some(path) = self.path.clone() else {
+					return task(Message::SaveAsFilePicker);
+				};
 
 				if let Err(e) = std::fs::write(&path, self.text.text()) {
 					error!("Error when saving: {e}");
 				} else {
 					info!("File {:?} saved successfully!", path)
 				}
+			}
+
+			Message::SaveAs(path) => {
+				self.path = Some(path);
+				return task(Message::Save);
 			}
 
 			Message::Edit(action) => self.text.perform(action),

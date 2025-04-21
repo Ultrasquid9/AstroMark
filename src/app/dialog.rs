@@ -1,8 +1,10 @@
 use std::path::PathBuf;
 
-use cosmic::{Action, Element, app::Task, widget};
+use cosmic::{Element, app::Task, widget};
 use cosmic_files::dialog::{Dialog, DialogKind, DialogResult};
 use tracing::{info, warn};
+
+use crate::app::message::task;
 
 use super::message::Message;
 
@@ -41,6 +43,14 @@ impl DialogManager {
 				result(paths, |pth| Message::OpenEditor(Some(pth)))
 			}
 
+			Message::SaveAsFilePicker if self.0.is_none() => self.picker(
+				DialogKind::SaveFile {
+					filename: "unnamed.md".into(),
+				},
+				Message::SaveAsFileResult,
+			),
+			Message::SaveAsFileResult(DialogResult::Open(paths)) => result(paths, Message::SaveAs),
+
 			_ => {
 				self.0 = None;
 				None
@@ -70,5 +80,5 @@ fn result(
 	};
 
 	info!("File {:?} selected", path);
-	Some(Task::done(Action::App(fun(path.clone()))))
+	Some(task(fun(path.clone())))
 }

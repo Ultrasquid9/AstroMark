@@ -9,4 +9,5 @@ new_file = New File
 
 file = File
 save = Save
+save_as = Save As
 go_home = Go Home
