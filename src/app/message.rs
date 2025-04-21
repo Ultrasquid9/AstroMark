@@ -9,8 +9,10 @@ pub enum Message {
 	Url(markdown::Url),
 	Save,
 
-	OpenFilePicker,
 	DialogMessage(DialogMessage),
+	//SaveAsFilePicker,
+	//SaveAsFileResult(DialogResult),
+	OpenFilePicker,
 	OpenFileResult(DialogResult),
 
 	OpenEditor(Option<PathBuf>),

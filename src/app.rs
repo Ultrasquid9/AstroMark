@@ -1,7 +1,11 @@
 use std::collections::HashMap;
 
 use cosmic::{
-	app::Task, executor, iced::window::Id, widget::menu::{self, Item, ItemHeight}, Application, ApplicationExt, Core, Element
+	Application, ApplicationExt, Core, Element,
+	app::Task,
+	executor,
+	iced::window::Id,
+	widget::menu::{self, Item, ItemHeight},
 };
 use dialog::DialogManager;
 use flags::Flags;

@@ -76,6 +76,16 @@ impl Screen for Editor {
 
 	fn update<'flags>(&'flags mut self, _: &'flags mut Flags, message: Message) -> Task<Message> {
 		match message {
+			Message::Save if self.path.is_some() => {
+				let path = self.path.clone().expect("Path is known to exist");
+
+				if let Err(e) = std::fs::write(&path, self.text.text()) {
+					error!("Error when saving: {e}");
+				} else {
+					info!("File {:?} saved successfully!", path)
+				}
+			}
+
 			Message::Edit(action) => self.text.perform(action),
 			Message::Url(url) => {
 				info!("Opening {}", url.as_str());
