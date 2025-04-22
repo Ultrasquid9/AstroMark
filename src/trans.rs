@@ -5,7 +5,7 @@ use i18n_embed::{
 	fluent::{FluentLanguageLoader, fluent_language_loader},
 };
 
-use crate::AppResult;
+use crate::utils::AppResult;
 
 pub static LOADER: OnceLock<FluentLanguageLoader> = OnceLock::new();
 

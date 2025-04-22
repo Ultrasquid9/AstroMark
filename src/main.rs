@@ -1,14 +1,12 @@
-use std::error::Error;
-
 use cosmic::app::{Settings, run};
 
+use utils::init;
+
 mod app;
-mod init;
 mod trans;
+mod utils;
 
-pub type AppResult<Ok> = Result<Ok, Box<dyn Error + Send + Sync>>;
-
-fn main() -> AppResult<()> {
+fn main() -> utils::AppResult<()> {
 	trans::init()?;
 	init::log()?;
 	let args = init::args();
