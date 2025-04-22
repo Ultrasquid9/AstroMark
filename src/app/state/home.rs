@@ -5,14 +5,10 @@ use cosmic::{
 	widget::{button, horizontal_space},
 };
 
-use crate::{
-	app::{flags::Flags, message::Message},
-	trans,
-};
+use crate::{app::message::Message, trans, utils::cfg::flags::Flags};
 
 use super::Screen;
 
-// TODO: Store recetly accessed files
 pub struct Home {}
 
 impl Home {

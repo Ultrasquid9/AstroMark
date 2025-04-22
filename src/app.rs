@@ -8,15 +8,13 @@ use cosmic::{
 	widget::menu::{self, Item, ItemHeight},
 };
 use dialog::DialogManager;
-use flags::Flags;
 use message::{MenuActions, Message};
 use state::{Screen, State};
 use tracing::error;
 
-use crate::trans;
+use crate::{trans, utils::cfg::flags::Flags};
 
 pub mod dialog;
-pub mod flags;
 pub mod message;
 pub mod state;
 

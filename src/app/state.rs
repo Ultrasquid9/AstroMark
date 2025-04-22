@@ -2,9 +2,9 @@ use std::fmt::Display;
 
 use cosmic::{Element, app::Task};
 
-use crate::trans;
+use crate::{trans, utils::cfg::flags::Flags};
 
-use super::{flags::Flags, message::Message};
+use super::message::Message;
 
 pub mod editor;
 pub mod home;

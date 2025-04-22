@@ -17,11 +17,9 @@ use cosmic::{
 use tracing::{error, info, warn};
 
 use crate::{
-	app::{
-		flags::Flags,
-		message::{Message, task},
-	},
+	app::message::{Message, task},
 	trans,
+	utils::cfg::flags::Flags,
 };
 
 use super::Screen;
