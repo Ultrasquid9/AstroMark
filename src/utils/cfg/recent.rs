@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use super::deserialize_or_default;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Default)]
 pub struct Recent(Vec<PathBuf>);
 
 impl Recent {
@@ -19,11 +19,5 @@ impl Recent {
 		while self.0.len() > 10 {
 			_ = self.0.remove(0)
 		}
-	}
-}
-
-impl Default for Recent {
-	fn default() -> Self {
-		Self(vec![])
 	}
 }

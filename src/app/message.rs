@@ -13,7 +13,7 @@ pub enum Message {
 	Url(markdown::Url),
 	Save,
 
-	DialogMessage(DialogMessage),
+	Dialog(DialogMessage),
 
 	SaveAsFilePicker,
 	SaveAsFileResult(DialogResult),

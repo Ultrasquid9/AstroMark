@@ -28,7 +28,7 @@ impl DialogManager {
 		let task_none = Some(Task::none());
 
 		match message {
-			Message::DialogMessage(dialog_message) => {
+			Message::Dialog(dialog_message) => {
 				if let Some(dialog) = &mut self.0 {
 					Some(dialog.update(dialog_message.clone()))
 				} else {
@@ -63,7 +63,7 @@ impl DialogManager {
 		kind: DialogKind,
 		fun: impl Fn(DialogResult) -> Message + 'static,
 	) -> Option<Task<Message>> {
-		let (dialog, task) = Dialog::new(kind, None, Message::DialogMessage, fun);
+		let (dialog, task) = Dialog::new(kind, None, Message::Dialog, fun);
 
 		self.0 = Some(dialog);
 		Some(task)
@@ -71,7 +71,7 @@ impl DialogManager {
 }
 
 fn result(
-	paths: &Vec<PathBuf>,
+	paths: &[PathBuf],
 	fun: impl Fn(PathBuf) -> Message + 'static,
 ) -> Option<Task<Message>> {
 	let Some(path) = paths.first() else {
