@@ -45,7 +45,16 @@ impl Screen for State {
 		message: Message,
 	) -> Task<Message> {
 		match &message {
-			Message::OpenEditor(path) => *self = Self::Editor(editor::Editor::new(path.clone())),
+			Message::OpenEditor(path) => {
+				// TODO: Decouple from Home
+				if let Self::Home(home) = self {
+					if let Some(path) = path {
+						home.recent.add(path.clone());
+					}
+				}
+
+				*self = Self::Editor(editor::Editor::new(path.clone()))
+			}
 			Message::OpenHome => *self = Self::Home(home::Home::new()),
 
 			_ => (),

@@ -70,10 +70,7 @@ impl DialogManager {
 	}
 }
 
-fn result(
-	paths: &[PathBuf],
-	fun: impl Fn(PathBuf) -> Message + 'static,
-) -> Option<Task<Message>> {
+fn result(paths: &[PathBuf], fun: impl Fn(PathBuf) -> Message + 'static) -> Option<Task<Message>> {
 	let Some(path) = paths.first() else {
 		warn!("No paths selected!");
 		return Some(Task::none());

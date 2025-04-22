@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, vec::IntoIter};
 
 use serde::{Deserialize, Serialize};
 
@@ -19,5 +19,18 @@ impl Recent {
 		while self.0.len() > 10 {
 			_ = self.0.remove(0)
 		}
+	}
+
+	pub fn get_inner(&self) -> &[PathBuf] {
+		&self.0
+	}
+}
+
+impl IntoIterator for Recent {
+	type Item = PathBuf;
+	type IntoIter = IntoIter<Self::Item>;
+
+	fn into_iter(self) -> Self::IntoIter {
+		self.0.into_iter()
 	}
 }
