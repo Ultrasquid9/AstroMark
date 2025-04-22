@@ -2,7 +2,14 @@ use std::fmt::Display;
 
 use cosmic::{Element, app::Task};
 
-use crate::{trans, utils::cfg::flags::Flags};
+use crate::{
+	trans,
+	utils::cfg::{
+		flags::Flags,
+		get_or_create_cfg_file,
+		recent::{self, Recent},
+	},
+};
 
 use super::message::Message;
 
@@ -46,11 +53,10 @@ impl Screen for State {
 	) -> Task<Message> {
 		match &message {
 			Message::OpenEditor(path) => {
-				// TODO: Decouple from Home
-				if let Self::Home(home) = self {
-					if let Some(path) = path {
-						home.recent.add(path.clone());
-					}
+				if let Some(path) = path {
+					let mut recent = Recent::read(get_or_create_cfg_file(recent::DIR));
+					recent.add(path.clone());
+					recent.write();
 				}
 
 				*self = Self::Editor(editor::Editor::new(path.clone()))

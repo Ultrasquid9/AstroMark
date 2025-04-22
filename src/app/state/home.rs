@@ -4,17 +4,18 @@ use cosmic::{
 	iced_widget::{Column, center, column, row},
 	widget::{button, horizontal_space},
 };
-use tracing::error;
 
 use crate::{
 	app::message::Message,
 	trans,
-	utils::cfg::{flags::Flags, get_or_create_cfg_file, recent::Recent},
+	utils::cfg::{
+		flags::Flags,
+		get_or_create_cfg_file,
+		recent::{DIR, Recent},
+	},
 };
 
 use super::Screen;
-
-const RECENTS: &str = "recent.ron";
 
 pub struct Home {
 	pub recent: Recent,
@@ -23,7 +24,7 @@ pub struct Home {
 impl Home {
 	pub fn new() -> Self {
 		Self {
-			recent: Recent::read(get_or_create_cfg_file(RECENTS)),
+			recent: Recent::read(get_or_create_cfg_file(DIR)),
 		}
 	}
 }
@@ -58,23 +59,5 @@ impl Screen for Home {
 		_message: Message,
 	) -> Task<Message> {
 		Task::none()
-	}
-}
-
-impl Drop for Home {
-	fn drop(&mut self) {
-		let dir = get_or_create_cfg_file(RECENTS);
-
-		let str = match ron::to_string(&self.recent) {
-			Ok(ok) => ok,
-			Err(e) => {
-				error!("{e}");
-				return;
-			}
-		};
-
-		if let Err(e) = std::fs::write(dir, str) {
-			error!("{e}");
-		}
 	}
 }
