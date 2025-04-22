@@ -14,6 +14,10 @@ impl Flags {
 	pub fn read(path: &PathBuf) -> Self {
 		deserialize_or_default(path)
 	}
+
+	pub fn space(&self) -> f32 {
+		self.text_size * 2.
+	}
 }
 
 impl Default for Flags {

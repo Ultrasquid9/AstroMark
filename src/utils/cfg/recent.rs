@@ -23,7 +23,8 @@ impl Recent {
 		self.0.retain(|p| *p != path);
 		self.0.push(path);
 
-		while self.0.len() > 10 {
+		// TODO: Use flags to control amount
+		while self.0.len() > 8 {
 			_ = self.0.remove(0)
 		}
 	}

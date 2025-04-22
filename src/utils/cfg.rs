@@ -49,12 +49,12 @@ where
 		Ok(str) => match ron::from_str(&str) {
 			Ok(flags) => flags,
 			Err(e) => {
-				error!("Error deserializing config: {e}");
+				error!("Error deserializing file: {e}");
 				Cfg::default()
 			}
 		},
 		Err(e) => {
-			error!("Error reading config: {e}");
+			error!("Error reading file: {e}");
 			Cfg::default()
 		}
 	}
