@@ -4,14 +4,15 @@ use cosmic::{
 	Element,
 	app::Task,
 	iced::{
+		Length,
 		keyboard::{self, key::Named},
 		theme::Palette,
 	},
-	iced_widget::row,
+	iced_widget::{column, row, scrollable},
 	widget::{
-		horizontal_space,
+		container, horizontal_space,
 		markdown::{self, Item},
-		text_editor,
+		text_editor, vertical_space,
 	},
 };
 use tracing::{error, info, warn};
@@ -58,19 +59,27 @@ impl Editor {
 impl Screen for Editor {
 	fn view<'flags>(&'flags self, flags: &'flags Flags) -> Element<'flags, Message> {
 		row![
-			text_editor(&self.text)
-				.key_binding(|kp| key_bindings(kp, flags))
-				.placeholder(&self.default_text)
-				.height(u16::MAX) // I doubt monitors will get that large anytime soon
-				.size(flags.text_size)
-				.on_action(Message::Edit),
-			horizontal_space().width(flags.text_size * 2.),
-			markdown::view(
-				self.md.iter(),
-				markdown::Settings::with_text_size(flags.text_size),
-				markdown::Style::from_palette(Palette::CATPPUCCIN_FRAPPE)
+			container(
+				text_editor(&self.text)
+					.key_binding(|kp| key_bindings(kp, flags))
+					.placeholder(&self.default_text)
+					.size(flags.text_size)
+					.height(Length::Fill)
+					.padding(10)
+					.on_action(Message::Edit)
 			)
-			.map(Message::Url)
+			.padding(10),
+			horizontal_space().width(flags.text_size),
+			scrollable(column![
+				markdown::view(
+					self.md.iter(),
+					markdown::Settings::with_text_size(flags.text_size),
+					markdown::Style::from_palette(Palette::CATPPUCCIN_FRAPPE)
+				)
+				.map(Message::Url),
+				vertical_space().height(flags.text_size * 10.)
+			])
+			.spacing(flags.text_size)
 		]
 		.into()
 	}
