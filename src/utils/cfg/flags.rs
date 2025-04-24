@@ -8,6 +8,7 @@ use crate::utils::cfg::deserialize_or_default;
 pub struct Flags {
 	pub text_size: f32,
 	pub tab_len: usize,
+	pub expand_tabs: bool,
 }
 
 impl Flags {
@@ -25,6 +26,7 @@ impl Default for Flags {
 		Self {
 			text_size: 14.,
 			tab_len: 4,
+			expand_tabs: false,
 		}
 	}
 }

@@ -1,10 +1,10 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, sync::Arc};
 
 use cosmic::{
 	Element,
 	app::Task,
 	iced::{
-		Length,
+		Font, Length, highlighter,
 		keyboard::{self, key::Named},
 		theme::Palette,
 	},
@@ -13,7 +13,11 @@ use cosmic::{
 		markdown::{self, Item},
 		row, scrollable,
 	},
-	widget::{container, horizontal_space, text_editor, vertical_space},
+	widget::{
+		self, container, horizontal_space,
+		text_editor::{self, Action, Binding, Edit},
+		vertical_space,
+	},
 };
 use tracing::{error, info, warn};
 
@@ -24,6 +28,8 @@ use crate::{
 };
 
 use super::Screen;
+
+const TAB: char = '\t';
 
 pub struct Editor {
 	path: Option<PathBuf>,
@@ -62,29 +68,42 @@ impl Editor {
 	fn parse_md(&mut self) {
 		self.md = markdown::parse(&self.text.text()).collect()
 	}
+
+	/// Slightly hacky way to insert hard tabs
+	fn hard_tab_hack(&mut self) {
+		let action1 = Action::Edit(Edit::Paste(Arc::new("\ta".into())));
+		let action2 = Action::Edit(Edit::Backspace);
+		self.text.perform(action1);
+		self.text.perform(action2);
+	}
 }
 
 impl Screen for Editor {
 	fn view<'flags>(&'flags self, flags: &'flags Flags) -> Element<'flags, Message> {
+		let editor = widget::text_editor(&self.text)
+			.key_binding(|kp| key_bindings(kp, flags))
+			.placeholder(&self.default_text)
+			.size(flags.text_size)
+			.font(Font::MONOSPACE)
+			// TODO: Configurable Theme
+			.highlight("markdown", highlighter::Theme::Base16Eighties)
+			.height(Length::Fill)
+			.padding(10)
+			.on_action(Message::Edit);
+
+		let markdown = markdown::view(
+			self.md.iter(),
+			markdown::Settings::with_text_size(flags.text_size),
+			// TODO: Configurable Theme
+			markdown::Style::from_palette(Palette::CATPPUCCIN_FRAPPE),
+		)
+		.map(Message::Url);
+
 		row![
-			container(
-				text_editor(&self.text)
-					.key_binding(|kp| key_bindings(kp, flags))
-					.placeholder(&self.default_text)
-					.size(flags.text_size)
-					.height(Length::Fill)
-					.padding(10)
-					.on_action(Message::Edit)
-			)
-			.padding(10),
+			container(editor).padding(10),
 			horizontal_space().width(flags.text_size),
 			scrollable(column![
-				markdown::view(
-					self.md.iter(),
-					markdown::Settings::with_text_size(flags.text_size),
-					markdown::Style::from_palette(Palette::CATPPUCCIN_FRAPPE)
-				)
-				.map(Message::Url),
+				markdown,
 				vertical_space().height(flags.text_size * 10.)
 			])
 			.spacing(flags.text_size)
@@ -114,7 +133,11 @@ impl Screen for Editor {
 			Message::Edit(action) => {
 				let is_edit = action.is_edit();
 
-				self.text.perform(action);
+				if let Action::Edit(Edit::Insert(TAB)) = action {
+					self.hard_tab_hack();
+				} else {
+					self.text.perform(action);
+				}
 
 				if is_edit {
 					self.parse_md();
@@ -136,18 +159,22 @@ impl Screen for Editor {
 	}
 }
 
-fn key_bindings(kp: text_editor::KeyPress, flags: &Flags) -> Option<text_editor::Binding<Message>> {
+fn key_bindings(kp: text_editor::KeyPress, flags: &Flags) -> Option<Binding<Message>> {
 	// TODO: Custom bindings; Vim/Helix motions maybe?
 	// Lua/Rhai config would be epic
 
 	if let keyboard::Key::Named(Named::Tab) = kp.key {
 		// Tabs
-		// TODO: Find some way to use hard tabs instead of spaces
-		Some(text_editor::Binding::Sequence(
-			vec![text_editor::Binding::Insert(' '); flags.tab_len],
-		))
+
+		let binding = if flags.expand_tabs {
+			Binding::Sequence(vec![Binding::Insert(' '); flags.tab_len])
+		} else {
+			Binding::Insert(TAB)
+		};
+
+		Some(binding)
 	} else {
 		// Default bindings
-		text_editor::Binding::from_key_press(kp)
+		Binding::from_key_press(kp)
 	}
 }
