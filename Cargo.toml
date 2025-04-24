@@ -29,7 +29,15 @@ default-features = false
 [dependencies.libcosmic]
 git = "https://github.com/pop-os/libcosmic.git"
 default-features = false
-features = ["a11y", "multi-window", "tokio", "winit", "surface-message", "markdown"]
+features = [
+	"a11y",
+	"multi-window",
+	"tokio",
+	"winit",
+	"surface-message",
+	"markdown",
+	"highlighter",
+]
 
 [profile.dev.package."*"]
 opt-level = 3

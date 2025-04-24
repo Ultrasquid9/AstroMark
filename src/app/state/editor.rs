@@ -8,12 +8,12 @@ use cosmic::{
 		keyboard::{self, key::Named},
 		theme::Palette,
 	},
-	iced_widget::{column, row, scrollable},
-	widget::{
-		container, horizontal_space,
+	iced_widget::{
+		column,
 		markdown::{self, Item},
-		text_editor, vertical_space,
+		row, scrollable,
 	},
+	widget::{container, horizontal_space, text_editor, vertical_space},
 };
 use tracing::{error, info, warn};
 
@@ -54,14 +54,14 @@ impl Editor {
 			md: vec![],
 		};
 
-        editor.parse_md();
+		editor.parse_md();
 
-        editor
+		editor
 	}
 
-    fn parse_md(&mut self) {
-        self.md = markdown::parse(&self.text.text()).collect()
-    }
+	fn parse_md(&mut self) {
+		self.md = markdown::parse(&self.text.text()).collect()
+	}
 }
 
 impl Screen for Editor {
@@ -112,14 +112,14 @@ impl Screen for Editor {
 			}
 
 			Message::Edit(action) => {
-                let is_edit = action.is_edit();
+				let is_edit = action.is_edit();
 
-                self.text.perform(action);
+				self.text.perform(action);
 
-                if is_edit {
-                    self.parse_md();
-                }
-            }
+				if is_edit {
+					self.parse_md();
+				}
+			}
 
 			Message::Url(url) => {
 				info!("Opening {}", url.as_str());
