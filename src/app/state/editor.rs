@@ -47,13 +47,21 @@ impl Editor {
 			text_editor::Content::new()
 		};
 
-		Self {
+		let mut editor = Self {
 			path,
 			default_text: trans!("default_text"),
 			text,
 			md: vec![],
-		}
+		};
+
+        editor.parse_md();
+
+        editor
 	}
+
+    fn parse_md(&mut self) {
+        self.md = markdown::parse(&self.text.text()).collect()
+    }
 }
 
 impl Screen for Editor {
@@ -103,7 +111,16 @@ impl Screen for Editor {
 				return task(Message::Save);
 			}
 
-			Message::Edit(action) => self.text.perform(action),
+			Message::Edit(action) => {
+                let is_edit = action.is_edit();
+
+                self.text.perform(action);
+
+                if is_edit {
+                    self.parse_md();
+                }
+            }
+
 			Message::Url(url) => {
 				info!("Opening {}", url.as_str());
 
@@ -114,9 +131,6 @@ impl Screen for Editor {
 
 			_ => (),
 		}
-
-		// TODO: Make async
-		self.md = markdown::parse(&self.text.text()).collect();
 
 		Task::none()
 	}
