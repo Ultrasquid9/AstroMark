@@ -1,11 +1,9 @@
-use std::{fs, path::PathBuf};
+use std::path::PathBuf;
 
-use clap::{ArgAction, ArgMatches, Command, arg, value_parser};
-use tracing::{Level, error, info};
+use clap::{ArgMatches, Command, arg, value_parser};
+use tracing::Level;
 
-use crate::utils::cfg::{default_str, flags::Flags};
-
-use super::{AppResult, cfg::get_or_create_cfg_file};
+use super::{cfg::{get_or_create_cfg_file, script::ScriptCfg}, AppResult};
 
 pub fn args() -> ArgMatches {
 	Command::new("AstroMark")
@@ -15,24 +13,18 @@ pub fn args() -> ArgMatches {
 			arg!(-c --config <FILE> "Use a custom config file")
 				.value_parser(value_parser!(PathBuf)),
 		)
-		.arg(arg!(-r --reset_config ... "Reset the config file").action(ArgAction::SetTrue))
+		// TODO: --default_config option
+		//.arg(arg!(-r --reset_config ... "Reset the config file").action(ArgAction::SetTrue))
 		.get_matches()
 }
 
-pub fn flags(args: &ArgMatches) -> Flags {
-	if args.get_flag("reset_config") {
-		info!("Resetting config!");
-		if let Err(e) = fs::write(get_or_create_cfg_file("config.ron"), default_str::<Flags>()) {
-			error!("{e}")
-		}
-	}
-
+pub fn cfg(args: &ArgMatches) -> ScriptCfg {
 	let dir = match args.get_one::<PathBuf>("config") {
 		Some(dir) => dir,
-		None => &get_or_create_cfg_file("config.ron"),
+		None => &get_or_create_cfg_file("config.rhai"),
 	};
 
-	Flags::read(dir)
+	ScriptCfg::read(dir)
 }
 
 pub fn log() -> AppResult<()> {

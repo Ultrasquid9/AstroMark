@@ -12,7 +12,7 @@ use message::{MenuActions, Message};
 use state::{Screen, State};
 use tracing::error;
 
-use crate::{trans, utils::cfg::flags::Flags};
+use crate::{trans, utils::cfg::script::ScriptCfg};
 
 pub mod dialog;
 pub mod message;
@@ -20,7 +20,7 @@ pub mod state;
 
 pub struct AstroMark {
 	core: Core,
-	flags: Flags,
+	flags: ScriptCfg,
 
 	dialog: DialogManager,
 	state: State,
@@ -29,7 +29,7 @@ pub struct AstroMark {
 impl Application for AstroMark {
 	type Executor = executor::Default;
 	type Message = Message;
-	type Flags = Flags;
+	type Flags = ScriptCfg;
 
 	const APP_ID: &'static str = "uwu.juni.astromark";
 

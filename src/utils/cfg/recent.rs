@@ -40,7 +40,7 @@ impl Recent {
 			}
 		};
 
-		if let Err(e) = std::fs::write(dir, COMMENT.to_string() + &str) {
+		if let Err(e) = std::fs::write(dir, COMMENT.to_string() + str.as_str()) {
 			error!("{e}");
 		}
 	}

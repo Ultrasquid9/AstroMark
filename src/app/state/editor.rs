@@ -22,9 +22,9 @@ use cosmic::{
 use tracing::{error, info, warn};
 
 use crate::{
-	app::message::{Message, task},
+	app::message::{task, Message},
 	trans,
-	utils::cfg::flags::Flags,
+	utils::cfg::script::ScriptCfg,
 };
 
 use super::Screen;
@@ -79,11 +79,11 @@ impl Editor {
 }
 
 impl Screen for Editor {
-	fn view<'flags>(&'flags self, flags: &'flags Flags) -> Element<'flags, Message> {
+	fn view<'flags>(&'flags self, flags: &'flags ScriptCfg) -> Element<'flags, Message> {
 		let editor = widget::text_editor(&self.text)
 			.key_binding(|kp| key_bindings(kp, flags))
 			.placeholder(&self.default_text)
-			.size(flags.text_size)
+			.size(flags.flags.text_size)
 			.font(Font::MONOSPACE)
 			// TODO: Configurable Theme
 			.highlight("markdown", highlighter::Theme::Base16Eighties)
@@ -93,7 +93,7 @@ impl Screen for Editor {
 
 		let markdown = markdown::view(
 			self.md.iter(),
-			markdown::Settings::with_text_size(flags.text_size),
+			markdown::Settings::with_text_size(flags.flags.text_size),
 			// TODO: Configurable Theme
 			markdown::Style::from_palette(Palette::CATPPUCCIN_FRAPPE),
 		)
@@ -101,17 +101,17 @@ impl Screen for Editor {
 
 		row![
 			container(editor).padding(10),
-			horizontal_space().width(flags.text_size),
+			horizontal_space().width(flags.flags.text_size),
 			scrollable(column![
 				markdown,
-				vertical_space().height(flags.text_size * 10.)
+				vertical_space().height(flags.flags.text_size * 10.)
 			])
-			.spacing(flags.text_size)
+			.spacing(flags.flags.text_size)
 		]
 		.into()
 	}
 
-	fn update<'flags>(&'flags mut self, _: &'flags mut Flags, message: Message) -> Task<Message> {
+	fn update<'flags>(&'flags mut self, _: &'flags mut ScriptCfg, message: Message) -> Task<Message> {
 		match message {
 			Message::Save => {
 				let Some(path) = self.path.clone() else {
@@ -159,15 +159,14 @@ impl Screen for Editor {
 	}
 }
 
-fn key_bindings(kp: text_editor::KeyPress, flags: &Flags) -> Option<Binding<Message>> {
-	// TODO: Custom bindings; Vim/Helix motions maybe?
-	// Lua/Rhai config would be epic
+fn key_bindings(kp: text_editor::KeyPress, flags: &ScriptCfg) -> Option<Binding<Message>> {
+	// TODO: Custom bindings; Vim/Helix motions
 
 	if let keyboard::Key::Named(Named::Tab) = kp.key {
 		// Tabs
 
-		let binding = if flags.expand_tabs {
-			Binding::Sequence(vec![Binding::Insert(' '); flags.tab_len])
+		let binding = if flags.flags.expand_tabs {
+			Binding::Sequence(vec![Binding::Insert(' '); flags.flags.tab_len])
 		} else {
 			Binding::Insert(TAB)
 		};

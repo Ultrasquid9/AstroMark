@@ -12,7 +12,7 @@ fn main() -> utils::AppResult<()> {
 	let args = init::args();
 
 	let settings = Settings::default();
-	let flags = init::flags(&args);
+	let flags = init::cfg(&args);
 
 	run::<app::AstroMark>(settings, flags)?;
 	Ok(())

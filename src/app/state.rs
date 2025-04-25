@@ -5,9 +5,8 @@ use cosmic::{Element, app::Task};
 use crate::{
 	trans,
 	utils::cfg::{
-		flags::Flags,
 		get_or_create_cfg_file,
-		recent::{self, Recent},
+		recent::{self, Recent}, script::ScriptCfg,
 	},
 };
 
@@ -17,11 +16,11 @@ pub mod editor;
 pub mod home;
 
 pub trait Screen {
-	fn view<'flags>(&'flags self, flags: &'flags Flags) -> Element<'flags, Message>;
+	fn view<'flags>(&'flags self, flags: &'flags ScriptCfg) -> Element<'flags, Message>;
 
 	fn update<'flags>(
 		&'flags mut self,
-		flags: &'flags mut Flags,
+		flags: &'flags mut ScriptCfg,
 		message: Message,
 	) -> Task<Message>;
 }
@@ -38,7 +37,7 @@ impl State {
 }
 
 impl Screen for State {
-	fn view<'flags>(&'flags self, flags: &'flags Flags) -> Element<'flags, Message> {
+	fn view<'flags>(&'flags self, flags: &'flags ScriptCfg) -> Element<'flags, Message> {
 		let screen: &dyn Screen = match self {
 			Self::Editor(editor) => editor,
 			Self::Home(home) => home,
@@ -48,7 +47,7 @@ impl Screen for State {
 
 	fn update<'flags>(
 		&'flags mut self,
-		flags: &'flags mut Flags,
+		flags: &'flags mut ScriptCfg,
 		message: Message,
 	) -> Task<Message> {
 		match &message {

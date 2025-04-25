@@ -1,10 +1,7 @@
-use std::path::PathBuf;
-
+use rhai::{CustomType, TypeBuilder};
 use serde::{Deserialize, Serialize};
 
-use crate::utils::cfg::deserialize_or_default;
-
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, CustomType)]
 pub struct Flags {
 	pub text_size: f32,
 	pub tab_len: usize,
@@ -12,10 +9,6 @@ pub struct Flags {
 }
 
 impl Flags {
-	pub fn read(path: &PathBuf) -> Self {
-		deserialize_or_default(path)
-	}
-
 	pub fn space(&self) -> f32 {
 		self.text_size * 2.
 	}
