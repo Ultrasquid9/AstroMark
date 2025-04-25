@@ -21,7 +21,7 @@ pub fn args() -> ArgMatches {
 pub fn cfg(args: &ArgMatches) -> ScriptCfg {
 	let dir = match args.get_one::<PathBuf>("config") {
 		Some(dir) => dir,
-		None => &get_or_create_cfg_file("config.rhai"),
+		None => &get_or_create_cfg_file::<_, ScriptCfg>("config.rhai"),
 	};
 
 	ScriptCfg::read(dir)

@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use rhai::{Engine, module_resolvers::FileModuleResolver};
 use tracing::error;
 
-use super::{flags::Flags, get_or_create_cfg_dir, DefaultStr};
+use super::{flags::Flags, get_or_create_cfg_dir, DefaultBytes};
 
 #[allow(unused)]
 pub struct ScriptCfg {
@@ -27,9 +27,9 @@ impl ScriptCfg {
 	}
 }
 
-impl DefaultStr for ScriptCfg {
-	fn default_str() -> String {
-		"flags()".into()
+impl DefaultBytes for ScriptCfg {
+	fn default_bytes() -> impl AsRef<[u8]> {
+		"flags()"
 	}
 }
 

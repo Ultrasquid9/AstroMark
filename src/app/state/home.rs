@@ -27,7 +27,7 @@ pub struct Home {
 impl Home {
 	pub fn new() -> Self {
 		Self {
-			recent: Recent::read(get_or_create_cfg_file(DIR)),
+			recent: Recent::read(get_or_create_cfg_file::<_, Recent>(DIR)),
 		}
 	}
 
@@ -38,6 +38,7 @@ impl Home {
 			.iter()
 			.map(|path| {
 				button::text(format_path(path))
+					.font_size(flags.text_size as u16)
 					.on_press(Message::OpenEditor(Some(path.clone())))
 					.into()
 			})
@@ -57,10 +58,14 @@ impl Screen for Home {
 			center(column![
 				text(trans!("get_started")).size(flags.flags.space()),
 				vertical_space().height(flags.flags.space()),
-				button::text(trans!("open_file")).on_press(Message::OpenFilePicker),
-				button::text(trans!("new_file")).on_press(Message::OpenEditor(None)),
+				button::text(trans!("open_file"))
+					.font_size(flags.flags.text_size as u16)
+					.on_press(Message::OpenFilePicker),
+				button::text(trans!("new_file"))
+					.font_size(flags.flags.text_size as u16)
+					.on_press(Message::OpenEditor(None)),
 			]),
-			horizontal_space().width(flags.flags.space()),
+			horizontal_space().width(flags.flags.text_size),
 			center(Column::with_children(self.recent_buttons(&flags.flags))),
 		]
 		.into()

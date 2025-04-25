@@ -1,10 +1,9 @@
-use script::ScriptCfg;
 use serde::de::DeserializeOwned;
 use std::{
 	fs,
 	path::{Path, PathBuf},
 };
-use tracing::{error, info};
+use tracing::{error, info, warn};
 
 use super::dir_exists_or_run;
 
@@ -12,8 +11,8 @@ pub mod flags;
 pub mod recent;
 pub mod script;
 
-pub trait DefaultStr {
-	fn default_str() -> String;
+pub trait DefaultBytes {
+	fn default_bytes() -> impl AsRef<[u8]>;
 }
 
 pub fn get_or_create_cfg_dir() -> PathBuf {
@@ -28,16 +27,17 @@ pub fn get_or_create_cfg_dir() -> PathBuf {
 	dir
 }
 
-pub fn get_or_create_cfg_file<Dir>(name: Dir) -> PathBuf
+pub fn get_or_create_cfg_file<Dir, Cfg>(name: Dir) -> PathBuf
 where
 	Dir: AsRef<Path>,
+	Cfg: DefaultBytes
 {
 	let mut dir = get_or_create_cfg_dir();
 
 	dir.push(name);
 	dir_exists_or_run(&dir, |pat| {
-		info!("No config file detected, creating one now...");
-		fs::write(pat, ScriptCfg::default_str())
+		info!("File {:?} not found, creating it now...", pat);
+		fs::write(pat, Cfg::default_bytes())
 	});
 
 	dir
@@ -48,11 +48,11 @@ where
 	Dir: AsRef<Path>,
 	Cfg: DeserializeOwned + Default,
 {
-	match fs::read_to_string(path) {
-		Ok(str) => match ron::from_str(&str) {
+	match fs::read(path) {
+		Ok(bytes) => match bincode::deserialize(&bytes) {
 			Ok(flags) => flags,
 			Err(e) => {
-				error!("Error deserializing file: {e}");
+				warn!("Error deserializing file: {e}");
 				Cfg::default()
 			}
 		},

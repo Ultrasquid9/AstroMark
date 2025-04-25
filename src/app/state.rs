@@ -53,7 +53,7 @@ impl Screen for State {
 		match &message {
 			Message::OpenEditor(path) => {
 				if let Some(path) = path {
-					let mut recent = Recent::read(get_or_create_cfg_file(recent::DIR));
+					let mut recent = Recent::read(get_or_create_cfg_file::<_, Recent>(recent::DIR));
 					recent.add(path.clone());
 					recent.write();
 				}

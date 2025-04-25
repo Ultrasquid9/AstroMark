@@ -378,6 +378,7 @@ dependencies = [
 name = "astromark"
 version = "0.1.0"
 dependencies = [
+ "bincode",
  "clap",
  "cosmic-files",
  "dirs 6.0.0",
@@ -386,7 +387,6 @@ dependencies = [
  "libcosmic",
  "open",
  "rhai",
- "ron 0.10.1",
  "rust-embed",
  "serde",
  "tracing",
@@ -1469,7 +1469,7 @@ dependencies = [
  "known-folders",
  "notify 8.0.0",
  "once_cell",
- "ron 0.9.0",
+ "ron",
  "serde",
  "tokio",
  "tracing",
@@ -1593,7 +1593,7 @@ dependencies = [
  "dirs 6.0.0",
  "lazy_static",
  "palette",
- "ron 0.9.0",
+ "ron",
  "serde",
  "serde_json",
  "thiserror 2.0.12",
@@ -5838,19 +5838,6 @@ name = "ron"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "63f3aa105dea217ef30d89581b65a4d527a19afc95ef5750be3890e8d3c5b837"
-dependencies = [
- "base64",
- "bitflags 2.9.0",
- "serde",
- "serde_derive",
- "unicode-ident",
-]
-
-[[package]]
-name = "ron"
-version = "0.10.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "beceb6f7bf81c73e73aeef6dd1356d9a1b2b4909e1f0fc3e59b034f9572d7b7f"
 dependencies = [
  "base64",
  "bitflags 2.9.0",

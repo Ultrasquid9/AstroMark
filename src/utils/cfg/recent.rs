@@ -3,13 +3,9 @@ use std::{path::PathBuf, vec::IntoIter};
 use serde::{Deserialize, Serialize};
 use tracing::error;
 
-use super::{deserialize_or_default, get_or_create_cfg_file};
+use super::{deserialize_or_default, get_or_create_cfg_file, DefaultBytes};
 
-pub const DIR: &str = "recent.ron";
-const COMMENT: &str = "\
-// This stores recently opened files
-// Please avoid editing it manually, or putting it in your dotfiles
-";
+pub const DIR: &str = ".recents";
 
 #[derive(Serialize, Deserialize, Default)]
 pub struct Recent(Vec<PathBuf>);
@@ -30,9 +26,9 @@ impl Recent {
 	}
 
 	pub fn write(&self) {
-		let dir = get_or_create_cfg_file(DIR);
+		let dir = get_or_create_cfg_file::<_, Self>(DIR);
 
-		let str = match ron::to_string(&self) {
+		let bytes = match bincode::serialize(&self) {
 			Ok(ok) => ok,
 			Err(e) => {
 				error!("{e}");
@@ -40,13 +36,19 @@ impl Recent {
 			}
 		};
 
-		if let Err(e) = std::fs::write(dir, COMMENT.to_string() + str.as_str()) {
+		if let Err(e) = std::fs::write(dir, bytes) {
 			error!("{e}");
 		}
 	}
 
 	pub fn get_inner(&self) -> &[PathBuf] {
 		&self.0
+	}
+}
+
+impl DefaultBytes for Recent {
+	fn default_bytes() -> impl AsRef<[u8]> {
+		bincode::serialize(&Self::default()).expect("Default should be serializable")
 	}
 }
 
