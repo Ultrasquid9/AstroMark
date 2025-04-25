@@ -30,7 +30,7 @@ pub fn get_or_create_cfg_dir() -> PathBuf {
 pub fn get_or_create_cfg_file<Dir, Cfg>(name: Dir) -> PathBuf
 where
 	Dir: AsRef<Path>,
-	Cfg: DefaultBytes
+	Cfg: DefaultBytes,
 {
 	let mut dir = get_or_create_cfg_dir();
 

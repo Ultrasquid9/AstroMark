@@ -3,7 +3,7 @@ use std::{path::PathBuf, vec::IntoIter};
 use serde::{Deserialize, Serialize};
 use tracing::error;
 
-use super::{deserialize_or_default, get_or_create_cfg_file, DefaultBytes};
+use super::{DefaultBytes, deserialize_or_default, get_or_create_cfg_file};
 
 pub const DIR: &str = ".recents";
 

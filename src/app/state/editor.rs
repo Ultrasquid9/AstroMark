@@ -22,7 +22,7 @@ use cosmic::{
 use tracing::{error, info, warn};
 
 use crate::{
-	app::message::{task, Message},
+	app::message::{Message, task},
 	trans,
 	utils::cfg::script::ScriptCfg,
 };
@@ -111,7 +111,11 @@ impl Screen for Editor {
 		.into()
 	}
 
-	fn update<'flags>(&'flags mut self, _: &'flags mut ScriptCfg, message: Message) -> Task<Message> {
+	fn update<'flags>(
+		&'flags mut self,
+		_: &'flags mut ScriptCfg,
+		message: Message,
+	) -> Task<Message> {
 		match message {
 			Message::Save => {
 				let Some(path) = self.path.clone() else {

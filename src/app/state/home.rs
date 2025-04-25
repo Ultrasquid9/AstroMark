@@ -14,7 +14,8 @@ use crate::{
 	utils::cfg::{
 		flags::Flags,
 		get_or_create_cfg_file,
-		recent::{Recent, DIR}, script::ScriptCfg,
+		recent::{DIR, Recent},
+		script::ScriptCfg,
 	},
 };
 

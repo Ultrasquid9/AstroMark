@@ -3,7 +3,10 @@ use std::path::PathBuf;
 use clap::{ArgMatches, Command, arg, value_parser};
 use tracing::Level;
 
-use super::{cfg::{get_or_create_cfg_file, script::ScriptCfg}, AppResult};
+use super::{
+	AppResult,
+	cfg::{get_or_create_cfg_file, script::ScriptCfg},
+};
 
 pub fn args() -> ArgMatches {
 	Command::new("AstroMark")

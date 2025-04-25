@@ -6,7 +6,8 @@ use crate::{
 	trans,
 	utils::cfg::{
 		get_or_create_cfg_file,
-		recent::{self, Recent}, script::ScriptCfg,
+		recent::{self, Recent},
+		script::ScriptCfg,
 	},
 };
 
