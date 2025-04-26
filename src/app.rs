@@ -103,26 +103,41 @@ impl Application for AstroMark {
 	}
 
 	fn update(&mut self, message: Self::Message) -> Task<Self::Message> {
+		self.update_tabs(&message);
 		self.update_header_title();
 
 		if let Some(task) = self.dialog.update(&message) {
 			return task;
 		}
 
-		let Some(state) = self.tabs.get_mut(&self.model.active()) else {
-			return Task::none();
-		};
-
-		state.update(&mut self.flags, message)
+		if let Some(state) = self.tabs.get_mut(&self.model.active()) {
+			state.update(&mut self.flags, message.clone())
+		} else {
+			Task::none()
+		}
 	}
 }
 
 impl AstroMark {
 	fn add_tab(&mut self, state: State) {
-		let tab = self.model.insert().text(state.to_string()).id();
+		let tab = self.model.insert().text(state.to_string()).closable().id();
 
 		self.model.activate(tab);
 		self.tabs.insert(tab, state);
+	}
+
+	fn update_tabs(&mut self, message: &Message) {
+		let Some(state) = self.tabs.get_mut(&self.model.active()) else {
+			return;
+		};
+
+		if let Some(new) = State::from_message(&message) {
+			if state.can_overwrite() {
+				*state = new;
+			} else {
+				self.add_tab(new);
+			}
+		}
 	}
 
 	fn current_state(&self) -> &State {

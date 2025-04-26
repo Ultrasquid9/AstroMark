@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, path::PathBuf};
 
 use cosmic::{Element, app::Task};
 
@@ -25,6 +25,37 @@ impl State {
 	pub fn new() -> Self {
 		Self::Home(home::Home::new())
 	}
+
+	pub fn can_overwrite(&self) -> bool {
+		if let Self::Home(_) = self {
+			true
+		} else {
+			false
+		}
+	}
+
+	pub fn from_message(message: &Message) -> Option<Self> {
+		match message {
+			Message::OpenEditor(path) => Some(Self::editor(path)),
+			Message::OpenHome => Some(Self::home()),
+
+			_ => None,
+		}
+	}
+
+	fn home() -> Self {
+		Self::Home(home::Home::new())
+	}
+
+	fn editor(path: &Option<PathBuf>) -> Self {
+		if let Some(path) = path {
+			let mut recent = Recent::read(get_or_create_cfg_file::<_, Recent>(recent::DIR));
+			recent.add(path.clone());
+			recent.write();
+		}
+
+		Self::Editor(editor::Editor::new(path.clone()))
+	}
 }
 
 impl Screen for State {
@@ -41,21 +72,6 @@ impl Screen for State {
 		flags: &'flags mut ScriptCfg,
 		message: Message,
 	) -> Task<Message> {
-		match &message {
-			Message::OpenEditor(path) => {
-				if let Some(path) = path {
-					let mut recent = Recent::read(get_or_create_cfg_file::<_, Recent>(recent::DIR));
-					recent.add(path.clone());
-					recent.write();
-				}
-
-				*self = Self::Editor(editor::Editor::new(path.clone()))
-			}
-			Message::OpenHome => *self = Self::Home(home::Home::new()),
-
-			_ => (),
-		}
-
 		let screen: &mut dyn Screen = match self {
 			Self::Editor(editor) => editor,
 			Self::Home(home) => home,
