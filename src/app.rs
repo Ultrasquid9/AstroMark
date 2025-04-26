@@ -1,15 +1,20 @@
-use std::collections::HashMap;
+use ahash::HashMap;
 
 use cosmic::{
 	Application, ApplicationExt, Core, Element,
 	app::Task,
 	executor,
 	iced::window::Id,
-	widget::menu::{self, Item, ItemHeight},
+	iced_widget::column,
+	widget::{
+		menu::{self, Item, ItemHeight},
+		segmented_button::{Entity, Model, SingleSelect},
+		tab_bar,
+	},
 };
 use dialog::DialogManager;
 use message::{MenuActions, Message};
-use state::{Screen, State};
+use state::State;
 use tracing::error;
 
 use crate::{trans, utils::cfg::script::ScriptCfg};
@@ -18,12 +23,23 @@ pub mod dialog;
 pub mod message;
 pub mod state;
 
+pub trait Screen {
+	fn view<'flags>(&'flags self, flags: &'flags ScriptCfg) -> Element<'flags, Message>;
+
+	fn update<'flags>(
+		&'flags mut self,
+		flags: &'flags mut ScriptCfg,
+		message: Message,
+	) -> Task<Message>;
+}
+
 pub struct AstroMark {
 	core: Core,
 	flags: ScriptCfg,
 
+	model: Model<SingleSelect>,
+	tabs: HashMap<Entity, State>,
 	dialog: DialogManager,
-	state: State,
 }
 
 impl Application for AstroMark {
@@ -46,9 +62,12 @@ impl Application for AstroMark {
 			core,
 			flags,
 
+			model: Model::builder().build(),
+			tabs: HashMap::default(),
 			dialog: DialogManager::new(),
-			state: State::new(),
 		};
+
+		app.add_tab(State::new());
 
 		let Some(id) = app.core.main_window_id() else {
 			error!("App window ID not found!");
@@ -66,7 +85,17 @@ impl Application for AstroMark {
 	}
 
 	fn view(&self) -> Element<Self::Message> {
-		self.state.view(&self.flags)
+		let Some(state) = self.tabs.get(&self.model.active()) else {
+			return column![].into();
+		};
+
+		let mut children = vec![state.view(&self.flags)];
+
+		if self.tabs.len() > 1 {
+			children.insert(0, tab_bar::horizontal(&self.model).into());
+		}
+
+		cosmic::widget::column::with_children(children).into()
 	}
 
 	fn view_window(&self, id: Id) -> Element<Self::Message> {
@@ -80,22 +109,47 @@ impl Application for AstroMark {
 			return task;
 		}
 
-		self.state.update(&mut self.flags, message)
+		let Some(state) = self.tabs.get_mut(&self.model.active()) else {
+			return Task::none();
+		};
+
+		state.update(&mut self.flags, message)
 	}
 }
 
 impl AstroMark {
+	fn add_tab(&mut self, state: State) {
+		let tab = self.model.insert().text(state.to_string()).id();
+
+		self.model.activate(tab);
+		self.tabs.insert(tab, state);
+	}
+
+	fn current_state(&self) -> &State {
+		match self.tabs.get(&self.model.active()) {
+			Some(state) => state,
+			None => {
+				error!("No state found!");
+				todo!()
+			}
+		}
+	}
+
 	fn update_header_title(&mut self) {
-		self.set_header_title(format!("{} - {}", trans!("astromark"), self.state));
+		self.set_header_title(format!(
+			"{} - {}",
+			trans!("astromark"),
+			self.current_state()
+		));
 	}
-}
 
-impl AstroMark {
 	fn menu_bar<'thing>(&self) -> Element<'thing, Message> {
+		use std::collections::HashMap;
+
 		let keybinds: HashMap<menu::KeyBind, MenuActions> = HashMap::new();
 
 		let mut file_menu = vec![];
-		if let State::Editor(_) = self.state {
+		if let State::Editor(_) = self.current_state() {
 			file_menu.append(&mut vec![
 				Item::Button(trans!("save"), None, MenuActions::Save),
 				Item::Button(trans!("save_as"), None, MenuActions::SaveAs),

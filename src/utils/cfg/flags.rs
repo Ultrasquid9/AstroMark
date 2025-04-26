@@ -1,7 +1,6 @@
 use rhai::{CustomType, TypeBuilder};
-use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Clone, CustomType)]
+#[derive(Clone, CustomType)]
 pub struct Flags {
 	pub text_size: f32,
 	pub tab_len: usize,

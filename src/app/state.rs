@@ -11,20 +11,10 @@ use crate::{
 	},
 };
 
-use super::message::Message;
+use super::{Screen, message::Message};
 
 pub mod editor;
 pub mod home;
-
-pub trait Screen {
-	fn view<'flags>(&'flags self, flags: &'flags ScriptCfg) -> Element<'flags, Message>;
-
-	fn update<'flags>(
-		&'flags mut self,
-		flags: &'flags mut ScriptCfg,
-		message: Message,
-	) -> Task<Message>;
-}
 
 pub enum State {
 	Editor(editor::Editor),
