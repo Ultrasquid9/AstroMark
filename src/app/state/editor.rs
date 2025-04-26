@@ -4,7 +4,7 @@ use cosmic::{
 	Element,
 	app::Task,
 	iced::{
-		Font, Length, highlighter,
+		Font, Length,
 		keyboard::{self, key::Named},
 		theme::Palette,
 	},
@@ -85,8 +85,7 @@ impl Screen for Editor {
 			.placeholder(&self.default_text)
 			.size(flags.flags.text_size)
 			.font(Font::MONOSPACE)
-			// TODO: Configurable Theme
-			.highlight("markdown", highlighter::Theme::Base16Eighties)
+			.highlight("markdown", flags.flags.highlight())
 			.height(Length::Fill)
 			.padding(10)
 			.on_action(Message::Edit);
