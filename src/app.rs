@@ -92,7 +92,14 @@ impl Application for AstroMark {
 		let mut children = vec![state.view(&self.flags)];
 
 		if self.tabs.len() > 1 {
-			children.insert(0, tab_bar::horizontal(&self.model).into());
+			children.insert(
+				0,
+				tab_bar::horizontal(&self.model)
+					.on_activate(Message::SwitchToTab)
+					.on_close(Message::KillTab)
+					.on_middle_press(Message::KillTab)
+					.into(),
+			);
 		}
 
 		cosmic::widget::column::with_children(children).into()
@@ -127,11 +134,34 @@ impl AstroMark {
 	}
 
 	fn update_tabs(&mut self, message: &Message) {
+		match message {
+			Message::SwitchToTab(id) => {
+				self.model.activate(*id);
+				return;
+			}
+			Message::KillTab(id) => {
+				// If the currently active tab is the one being closed, switch to a different one
+				if self.model.active() == *id {
+					// Ensuring that you are being sent to a tab that isn't being closed
+					let to_activate = match self.model.position(*id) {
+						Some(0) => 1,
+						_ => 0,
+					};
+					self.model.activate_position(to_activate);
+				}
+
+				self.tabs.remove(id);
+				self.model.remove(*id);
+				return;
+			}
+			_ => (),
+		}
+
 		let Some(state) = self.tabs.get_mut(&self.model.active()) else {
 			return;
 		};
 
-		if let Some(new) = State::from_message(&message) {
+		if let Some(new) = State::from_message(message) {
 			if state.can_overwrite() {
 				*state = new;
 			} else {

@@ -27,11 +27,7 @@ impl State {
 	}
 
 	pub fn can_overwrite(&self) -> bool {
-		if let Self::Home(_) = self {
-			true
-		} else {
-			false
-		}
+		matches!(self, Self::Home(_))
 	}
 
 	pub fn from_message(message: &Message) -> Option<Self> {

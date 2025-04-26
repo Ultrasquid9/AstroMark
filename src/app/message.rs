@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use cosmic::{
 	Action,
 	app::Task,
-	widget::{markdown, menu::action::MenuAction, text_editor},
+	widget::{markdown, menu::action::MenuAction, segmented_button::Entity, text_editor},
 };
 use cosmic_files::dialog::{DialogMessage, DialogResult};
 
@@ -24,6 +24,8 @@ pub enum Message {
 
 	OpenEditor(Option<PathBuf>),
 	OpenHome,
+	SwitchToTab(Entity),
+	KillTab(Entity),
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
