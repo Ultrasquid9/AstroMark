@@ -1,12 +1,9 @@
-use std::path::PathBuf;
-
 use cosmic::{
 	Element,
 	app::Task,
 	iced_widget::{Column, center, column, row, text},
 	widget::{button, horizontal_space, vertical_space},
 };
-use tracing::error;
 
 use crate::{
 	app::message::Message,
@@ -19,7 +16,7 @@ use crate::{
 	},
 };
 
-use super::Screen;
+use super::{format_path, Screen};
 
 pub struct Home {
 	pub recent: Recent,
@@ -79,24 +76,4 @@ impl Screen for Home {
 	) -> Task<Message> {
 		Task::none()
 	}
-}
-
-fn format_path(path: &PathBuf) -> String {
-	let file_name = match path.file_name() {
-		Some(file_name) => file_name,
-		None => {
-			error!("File {:?} has no name", path);
-			return "Unnamed".into();
-		}
-	};
-
-	let name = match file_name.to_str() {
-		Some(name) => name,
-		None => {
-			error!("File {:?} has an invalid name", path);
-			return "Invalid Name".into();
-		}
-	};
-
-	name.into()
 }
