@@ -16,7 +16,7 @@ use crate::{
 	},
 };
 
-use super::{format_path, Screen};
+use super::{Screen, format_path};
 
 pub struct Home {
 	pub recent: Recent,

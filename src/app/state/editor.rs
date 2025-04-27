@@ -27,7 +27,7 @@ use crate::{
 	utils::cfg::script::ScriptCfg,
 };
 
-use super::Screen;
+use super::{Screen, format_path};
 
 const TAB: char = '\t';
 
@@ -63,6 +63,14 @@ impl Editor {
 		editor.parse_md();
 
 		editor
+	}
+
+	pub fn name(&self) -> String {
+		if let Some(path) = &self.path {
+			format_path(&path)
+		} else {
+			trans!("new_file")
+		}
 	}
 
 	fn parse_md(&mut self) {

@@ -67,6 +67,7 @@ impl Application for AstroMark {
 			dialog: DialogManager::new(),
 		};
 
+		app.set_header_title(trans!("astromark"));
 		app.add_tab(State::new());
 
 		let Some(id) = app.core.main_window_id() else {
@@ -76,7 +77,6 @@ impl Application for AstroMark {
 
 		let tasks = [app.set_window_title(trans!("astromark"), id)];
 
-		app.update_header_title();
 		(app, Task::batch(tasks))
 	}
 
@@ -111,7 +111,6 @@ impl Application for AstroMark {
 
 	fn update(&mut self, message: Self::Message) -> Task<Self::Message> {
 		self.update_tabs(&message);
-		self.update_header_title();
 
 		if let Some(task) = self.dialog.update(&message) {
 			return task;
@@ -178,14 +177,6 @@ impl AstroMark {
 				todo!()
 			}
 		}
-	}
-
-	fn update_header_title(&mut self) {
-		self.set_header_title(format!(
-			"{} - {}",
-			trans!("astromark"),
-			self.current_state()
-		));
 	}
 
 	fn menu_bar<'thing>(&self) -> Element<'thing, Message> {

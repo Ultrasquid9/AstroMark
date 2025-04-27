@@ -80,7 +80,7 @@ impl Screen for State {
 impl Display for State {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		match self {
-			State::Editor(_) => f.write_str(&trans!("editor")),
+			State::Editor(editor) => f.write_str(&editor.name()),
 			State::Home(_) => f.write_str(&trans!("home")),
 		}
 	}
