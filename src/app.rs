@@ -156,16 +156,14 @@ impl AstroMark {
 			_ => (),
 		}
 
-		let Some(state) = self.tabs.get_mut(&self.model.active()) else {
-			return;
-		};
-
 		if let Some(new) = State::from_message(message) {
-			if state.can_overwrite() {
-				*state = new;
-			} else {
-				self.add_tab(new);
+			if matches!(self.tabs.get(&self.model.active()), Some(state) if state.can_overwrite()) {
+				let id = self.model.active();
+
+				self.tabs.remove(&id);
+				self.model.remove(id);
 			}
+			self.add_tab(new);
 		}
 	}
 
