@@ -1,5 +1,6 @@
 use cosmic::iced::highlighter::Theme;
 use rhai::{CustomType, TypeBuilder};
+use tracing::warn;
 
 #[derive(Clone, CustomType)]
 pub struct Flags {
@@ -21,7 +22,11 @@ impl Flags {
 			"base16ocean" => Theme::Base16Ocean,
 			"inspiredgithub" => Theme::InspiredGitHub,
 			"solarizeddark" => Theme::SolarizedDark,
-			_ => Theme::Base16Eighties,
+
+			unknown => {
+				warn!("Highlight {unknown} not found");
+				Theme::Base16Eighties
+			}
 		}
 	}
 }
