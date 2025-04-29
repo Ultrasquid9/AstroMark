@@ -14,6 +14,12 @@ fn main() -> utils::AppResult<()> {
 	let settings = Settings::default();
 	let flags = init::cfg(&args);
 
+	// Testing the Rhai callback system
+	match flags.call_rhai_fn::<()>(flags.flags.callback.clone(), ()) {
+		Err(e) => tracing::error!("{e}"),
+		_ => (),
+	}
+
 	run::<app::AstroMark>(settings, flags)?;
 	Ok(())
 }

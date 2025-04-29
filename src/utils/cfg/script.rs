@@ -1,37 +1,45 @@
 use std::path::PathBuf;
 
-use rhai::Engine;
-use tracing::error;
+use rhai::{AST, Engine, FnPtr, FuncArgs};
+
+use crate::utils::{AppResult, ok_or_default};
 
 use super::{DefaultBytes, flags::Flags};
 
 pub mod engine;
 
+const DEFAULT_CFG: &str = "\
+let flags = flags();
+
+flags
+";
+
 #[allow(unused)]
 pub struct ScriptCfg {
 	engine: Engine,
+	ast: AST,
 	pub flags: Flags,
 }
 
 impl ScriptCfg {
 	pub fn read(path: &PathBuf) -> Self {
 		let engine = engine::engine();
+		let ast = ok_or_default(engine.compile_file(path.into()));
+		let flags = ok_or_default(engine.eval_ast::<Flags>(&ast));
 
-		let flags = match engine.eval_file::<Flags>(path.into()) {
-			Ok(ok) => ok,
-			Err(e) => {
-				error!("{e}");
-				Flags::default()
-			}
-		};
+		Self { engine, ast, flags }
+	}
 
-		Self { engine, flags }
+	pub fn call_rhai_fn<T>(&self, fnptr: FnPtr, args: impl FuncArgs) -> AppResult<T>
+	where
+		T: Send + Sync + Clone + 'static,
+	{
+		Ok(fnptr.call(&self.engine, &self.ast, args)?)
 	}
 }
 
 impl DefaultBytes for ScriptCfg {
 	fn default_bytes() -> impl AsRef<[u8]> {
-		// TODO: "Default Config" file
-		"flags()"
+		DEFAULT_CFG
 	}
 }

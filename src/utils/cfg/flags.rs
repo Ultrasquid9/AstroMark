@@ -1,5 +1,5 @@
 use cosmic::iced::highlighter::Theme;
-use rhai::{CustomType, TypeBuilder};
+use rhai::{CustomType, FnPtr, TypeBuilder};
 use tracing::warn;
 
 #[derive(Clone, CustomType)]
@@ -8,6 +8,7 @@ pub struct Flags {
 	pub tab_len: usize,
 	pub expand_tabs: bool,
 	pub highlight: String,
+	pub callback: FnPtr,
 }
 
 impl Flags {
@@ -38,6 +39,7 @@ impl Default for Flags {
 			tab_len: 4,
 			expand_tabs: false,
 			highlight: "base16eighties".into(),
+			callback: FnPtr::new("callback").unwrap(),
 		}
 	}
 }

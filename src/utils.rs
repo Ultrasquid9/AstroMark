@@ -21,3 +21,17 @@ where
 		}
 	}
 }
+
+pub fn ok_or_default<Ok, Err>(opt: Result<Ok, Err>) -> Ok
+where
+	Ok: Default,
+	Err: Error,
+{
+	match opt {
+		Ok(opt) => opt,
+		Err(e) => {
+			error!("{e}");
+			Ok::default()
+		}
+	}
+}
