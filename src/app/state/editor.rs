@@ -67,7 +67,7 @@ impl Editor {
 
 	pub fn name(&self) -> String {
 		if let Some(path) = &self.path {
-			format_path(&path)
+			format_path(path)
 		} else {
 			trans!("new_file")
 		}

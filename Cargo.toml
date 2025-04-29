@@ -43,5 +43,12 @@ features = [
 	"highlighter",
 ]
 
+# Remove debug info 
+# Most debugging should be done via tracing, making this (mostly) irrelevant
+[profile.dev]
+debug = 0
+strip = "debuginfo"
+
+# Build dependencies with high optimization
 [profile.dev.package."*"]
 opt-level = 3
