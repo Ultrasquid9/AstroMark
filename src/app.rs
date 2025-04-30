@@ -156,7 +156,7 @@ impl AstroMark {
 			_ => (),
 		}
 
-		if let Some(new) = State::from_message(message) {
+		if let Some(new) = State::from_message(&self.flags.flags, message) {
 			if matches!(self.tabs.get(&self.model.active()), Some(state) if state.can_overwrite()) {
 				let id = self.model.active();
 

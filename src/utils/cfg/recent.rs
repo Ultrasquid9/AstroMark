@@ -3,7 +3,9 @@ use std::{path::PathBuf, vec::IntoIter};
 use serde::{Deserialize, Serialize};
 use tracing::error;
 
-use super::{DefaultBytes, deserialize_or_default, get_or_create_cfg_file};
+use crate::utils::ok_or_default;
+
+use super::{DefaultBytes, deserialize_or_default, flags::Flags, get_or_create_cfg_file};
 
 pub const DIR: &str = ".recents";
 
@@ -15,12 +17,11 @@ impl Recent {
 		deserialize_or_default(path)
 	}
 
-	pub fn add(&mut self, path: PathBuf) {
+	pub fn add(&mut self, flags: &Flags, path: PathBuf) {
 		self.0.retain(|p| *p != path);
 		self.0.push(path);
 
-		// TODO: Use flags to control amount
-		while self.0.len() > 8 {
+		while self.0.len() > flags.max_recents() {
 			_ = self.0.remove(0)
 		}
 	}
@@ -48,7 +49,7 @@ impl Recent {
 
 impl DefaultBytes for Recent {
 	fn default_bytes() -> impl AsRef<[u8]> {
-		bincode::serialize(&Self::default()).expect("Default should be serializable")
+		ok_or_default(bincode::serialize(&Self::default()))
 	}
 }
 

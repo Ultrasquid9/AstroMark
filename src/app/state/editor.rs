@@ -177,7 +177,7 @@ fn key_bindings(kp: text_editor::KeyPress, flags: &ScriptCfg) -> Option<Binding<
 		// Tabs
 
 		let binding = if flags.flags.expand_tabs {
-			Binding::Sequence(vec![Binding::Insert(' '); flags.flags.tab_len])
+			Binding::Sequence(vec![Binding::Insert(' '); flags.flags.tab_len()])
 		} else {
 			Binding::Insert(TAB)
 		};

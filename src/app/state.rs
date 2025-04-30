@@ -6,6 +6,7 @@ use tracing::error;
 use crate::{
 	trans,
 	utils::cfg::{
+		flags::Flags,
 		get_or_create_cfg_file,
 		recent::{self, Recent},
 		script::ScriptCfg,
@@ -31,9 +32,9 @@ impl State {
 		matches!(self, Self::Home(_))
 	}
 
-	pub fn from_message(message: &Message) -> Option<Self> {
+	pub fn from_message(flags: &Flags, message: &Message) -> Option<Self> {
 		match message {
-			Message::OpenEditor(path) => Some(Self::editor(path)),
+			Message::OpenEditor(path) => Some(Self::editor(flags, path)),
 			Message::OpenHome => Some(Self::home()),
 
 			_ => None,
@@ -44,10 +45,10 @@ impl State {
 		Self::Home(home::Home::new())
 	}
 
-	fn editor(path: &Option<PathBuf>) -> Self {
+	fn editor(flags: &Flags, path: &Option<PathBuf>) -> Self {
 		if let Some(path) = path {
 			let mut recent = Recent::read(get_or_create_cfg_file::<_, Recent>(recent::DIR));
-			recent.add(path.clone());
+			recent.add(flags, path.clone());
 			recent.write();
 		}
 
