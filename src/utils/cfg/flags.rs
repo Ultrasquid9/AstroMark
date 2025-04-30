@@ -1,5 +1,5 @@
 use cosmic::iced::highlighter::Theme;
-use rhai::{CustomType, FnPtr, TypeBuilder};
+use rhai::{Array, CustomType, FnPtr, TypeBuilder};
 use tracing::warn;
 
 use crate::utils::ok_or_default;
@@ -18,7 +18,10 @@ pub struct Flags {
 	pub expand_tabs: bool,
 	/// The highlighting theme used by the editor
 	pub highlight: String,
-	/// Function ran when starting the app  
+	/// Keybinds used throughout the app
+	pub general_keybinds: Array,
+	/// Function ran when starting the app
+	/// Mostly useful for debugging purposes
 	pub callback: FnPtr,
 }
 
@@ -60,6 +63,7 @@ impl Default for Flags {
 			max_recents: 8,
 			highlight: "base16eighties".into(),
 			callback: FnPtr::new("callback").unwrap(),
+			general_keybinds: vec![],
 		}
 	}
 }

@@ -7,6 +7,8 @@ use cosmic::{
 };
 use cosmic_files::dialog::{DialogMessage, DialogResult};
 
+use crate::enum_mod;
+
 #[derive(Debug, Clone)]
 pub enum Message {
 	Edit(text_editor::Action),
@@ -53,4 +55,14 @@ impl MenuAction for MenuActions {
 
 pub fn task(message: Message) -> Task<Message> {
 	Task::done(Action::App(message))
+}
+
+enum_mod! {
+	menu_actions(MenuActions) {
+		Save,
+		SaveAs,
+		OpenFile,
+		NewFile,
+		GoHome
+	}
 }

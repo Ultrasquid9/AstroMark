@@ -22,6 +22,7 @@ where
 	}
 }
 
+/// Returns the Ok value if present. Otherwise, returns the default.
 pub fn ok_or_default<Ok, Err>(opt: Result<Ok, Err>) -> Ok
 where
 	Ok: Default,
@@ -34,4 +35,31 @@ where
 			Ok::default()
 		}
 	}
+}
+
+/// Creates constants for each enum variant provided
+#[macro_export]
+macro_rules! const_enum {
+	($type:ty : [ $( $variant:ident ),+ ]) => {
+		$(
+			#[allow(non_upper_case_globals)]
+			pub const $variant: MenuActions = MenuActions::$variant;
+		)*
+	};
+}
+
+/// Creates a module containing constants for each enum variant provided
+#[macro_export]
+macro_rules! enum_mod {
+	($mod:ident ( $type:ty ) { $( $variant:ident ),+ }) => {
+		use rhai::{export_module, Module};
+
+		#[export_module]
+		pub mod $mod {
+			$(
+				#[allow(non_upper_case_globals)]
+				pub const $variant: MenuActions = MenuActions::$variant;
+			)*
+		}
+	};
 }

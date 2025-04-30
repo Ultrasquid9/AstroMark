@@ -8,6 +8,7 @@ ahash = "0.8"
 clap = "4.5"
 dirs = "6"
 open = "5.3"
+smol_str = "0.2.2"
 
 # (de)serialization
 bincode = "1.3"

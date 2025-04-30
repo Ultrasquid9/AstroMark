@@ -7,6 +7,7 @@ use crate::utils::{AppResult, ok_or_default};
 use super::{DefaultBytes, flags::Flags};
 
 pub mod engine;
+pub mod keybinds;
 
 const DEFAULT_CFG: &str = "\
 let flags = flags();
