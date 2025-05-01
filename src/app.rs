@@ -4,7 +4,12 @@ use cosmic::{
 	Application, ApplicationExt, Core, Element,
 	app::Task,
 	executor,
-	iced::window::Id,
+	iced::{
+		Subscription,
+		event::{Event, Status, listen_with},
+		window::Id,
+	},
+	iced_core::keyboard,
 	iced_widget::column,
 	widget::{
 		menu::{self, Item, ItemHeight},
@@ -13,7 +18,7 @@ use cosmic::{
 	},
 };
 use dialog::DialogManager;
-use message::{MenuActions, Message};
+use message::{MenuActions, Message, task};
 use state::State;
 use tracing::error;
 
@@ -84,6 +89,23 @@ impl Application for AstroMark {
 		vec![self.menu_bar()]
 	}
 
+	fn view_window(&self, id: Id) -> Element<Self::Message> {
+		self.dialog.view_window(id)
+	}
+
+	fn subscription(&self) -> Subscription<Self::Message> {
+		let subscriptions = vec![listen_with(|event, status, _id| match event {
+			Event::Keyboard(keyboard::Event::KeyPressed { key, modifiers, .. })
+				if status != Status::Captured =>
+			{
+				Some(Message::KeyPress(key, modifiers))
+			}
+			_ => None,
+		})];
+
+		Subscription::batch(subscriptions)
+	}
+
 	fn view(&self) -> Element<Self::Message> {
 		let Some(state) = self.tabs.get(&self.model.active()) else {
 			return column![].into();
@@ -105,16 +127,21 @@ impl Application for AstroMark {
 		cosmic::widget::column::with_children(children).into()
 	}
 
-	fn view_window(&self, id: Id) -> Element<Self::Message> {
-		self.dialog.view_window(id)
-	}
-
 	fn update(&mut self, message: Self::Message) -> Task<Self::Message> {
 		self.update_tabs(&message);
 
-		if let Some(task) = self.dialog.update(&message) {
-			return task;
+		macro_rules! return_if_some {
+			( $( $opt:expr; )+ ) => { $(
+				if let Some(task) = $opt {
+					return task;
+				}
+			)+ };
 		}
+
+		return_if_some![
+			self.dialog.update(&message);
+			self.keybinds(&message);
+		];
 
 		if let Some(state) = self.tabs.get_mut(&self.model.active()) {
 			state.update(&mut self.flags, message.clone())
@@ -178,10 +205,6 @@ impl AstroMark {
 	}
 
 	fn menu_bar<'thing>(&self) -> Element<'thing, Message> {
-		use std::collections::HashMap;
-
-		let keybinds: HashMap<menu::KeyBind, MenuActions> = HashMap::new();
-
 		let mut file_menu = vec![];
 		if let State::Editor(_) = self.current_state() {
 			file_menu.append(&mut vec![
@@ -199,9 +222,20 @@ impl AstroMark {
 
 		menu::bar(vec![menu::Tree::with_children(
 			menu::root(trans!("file")),
-			menu::items(&keybinds, file_menu),
+			menu::items(&self.flags.flags.general_keybinds(), file_menu),
 		)])
 		.item_height(ItemHeight::Dynamic(40))
 		.into()
+	}
+
+	fn keybinds(&self, message: &Message) -> Option<Task<Message>> {
+		if let Message::KeyPress(key, modifiers) = message {
+			for (keybind, action) in self.flags.flags.general_keybinds() {
+				if keybind.matches(*modifiers, key) {
+					return Some(task(action.into()));
+				}
+			}
+		}
+		None
 	}
 }

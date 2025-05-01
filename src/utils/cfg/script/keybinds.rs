@@ -1,5 +1,8 @@
-use cosmic::{iced_core::keyboard, widget::menu::key_bind::Modifier};
-use rhai::{CustomType, Module, TypeBuilder, export_module};
+use cosmic::{
+	iced_core::keyboard,
+	widget::menu::{KeyBind, key_bind::Modifier},
+};
+use rhai::{Array, CustomType, Module, TypeBuilder, export_module};
 use smol_str::SmolStr;
 use tracing::warn;
 
@@ -19,7 +22,12 @@ impl Key {
 }
 
 impl Keybind {
-	pub fn new(key: Key, modifiers: Vec<Key>) -> Self {
+	pub fn new(key: Key, modifiers: Array) -> Self {
+		let modifiers = modifiers
+			.iter()
+			.filter_map(|item| item.clone().try_cast())
+			.collect();
+
 		Self { key, modifiers }
 	}
 }
@@ -48,14 +56,25 @@ impl From<Key> for Option<Modifier> {
 	}
 }
 
+impl From<Keybind> for KeyBind {
+	fn from(bind: Keybind) -> Self {
+		Self {
+			key: bind.key.into(),
+			modifiers: bind
+				.modifiers
+				.iter()
+				.filter_map(|item| item.clone().into())
+				.collect(),
+		}
+	}
+}
+
 #[export_module]
 pub mod modifiers {
-	use smol_str::SmolStr;
-
 	use super::Key;
 
 	const fn key(str: &'static str) -> Key {
-		Key(SmolStr::new_static(str))
+		Key(smol_str::SmolStr::new_static(str))
 	}
 
 	pub const SUPER: Key = key("Super");

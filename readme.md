@@ -5,3 +5,4 @@ AstroMark is a super simple graphical Markdown editor, designed to fit into the 
 Note: AstroMark is currently WIP. 
 
 This file has been edited with AstroMark!
+This file has been edited with AstroMark again!

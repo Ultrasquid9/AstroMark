@@ -1,8 +1,13 @@
-use cosmic::iced::highlighter::Theme;
-use rhai::{Array, CustomType, FnPtr, TypeBuilder};
+use std::collections::HashMap;
+
+use cosmic::{iced::highlighter::Theme, widget::menu};
+use rhai::{Array, CustomType, FnPtr, Map, TypeBuilder};
 use tracing::warn;
 
-use crate::utils::ok_or_default;
+use crate::{
+	app::message::MenuActions,
+	utils::{cfg::script::keybinds::Keybind, ok_or_default},
+};
 
 #[derive(Clone, CustomType)]
 pub struct Flags {
@@ -51,6 +56,46 @@ impl Flags {
 
 	pub fn max_recents(&self) -> usize {
 		ok_or_default(usize::try_from(self.max_recents))
+	}
+
+	pub fn general_keybinds(&self) -> HashMap<menu::KeyBind, MenuActions> {
+		let mut keybinds = HashMap::new();
+
+		let map_array = self
+			.general_keybinds
+			.iter()
+			.filter_map(|item| match item.as_map_ref() {
+				Ok(map) => Some(map.clone()),
+				Err(e) => {
+					warn!("Type {e} is not a map!");
+					None
+				}
+			})
+			.collect::<Vec<Map>>();
+
+		for map in map_array {
+			macro_rules! maybe {
+				($in:expr ; $err:literal) => {
+					match $in {
+						Some(out) => out,
+						None => {
+							warn!($err);
+							continue;
+						}
+					}
+				};
+			}
+
+			let dyn_action = maybe!(map.get("action"); "No \"action\" field found");
+			let dyn_keybind = maybe!(map.get("keybind"); "No \"keybind\" field found");
+
+			let action = maybe!(dyn_action.clone().try_cast::<MenuActions>(); "\"action\" could not be cast to MenuAction");
+			let keybind = maybe!(dyn_keybind.clone().try_cast::<Keybind>(); "\"keybind\" could not be cast to Keybind");
+
+			keybinds.insert(keybind.into(), action);
+		}
+
+		keybinds
 	}
 }
 

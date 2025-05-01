@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use cosmic::{
 	Action,
 	app::Task,
+	iced::keyboard::{Key, Modifiers},
 	widget::{markdown, menu::action::MenuAction, segmented_button::Entity, text_editor},
 };
 use cosmic_files::dialog::{DialogMessage, DialogResult};
@@ -15,6 +16,7 @@ pub enum Message {
 	Url(markdown::Url),
 	Save,
 
+	KeyPress(Key, Modifiers),
 	Dialog(DialogMessage),
 
 	SaveAsFilePicker,
@@ -39,17 +41,23 @@ pub enum MenuActions {
 	GoHome,
 }
 
+impl From<MenuActions> for Message {
+	fn from(action: MenuActions) -> Self {
+		match action {
+			MenuActions::Save => Self::Save,
+			MenuActions::SaveAs => Self::SaveAsFilePicker,
+			MenuActions::OpenFile => Self::OpenFilePicker,
+			MenuActions::NewFile => Self::OpenEditor(None),
+			MenuActions::GoHome => Self::OpenHome,
+		}
+	}
+}
+
 impl MenuAction for MenuActions {
 	type Message = Message;
 
 	fn message(&self) -> Self::Message {
-		match self {
-			Self::Save => Message::Save,
-			Self::SaveAs => Message::SaveAsFilePicker,
-			Self::OpenFile => Message::OpenFilePicker,
-			Self::NewFile => Message::OpenEditor(None),
-			Self::GoHome => Message::OpenHome,
-		}
+		Message::from(*self)
 	}
 }
 
