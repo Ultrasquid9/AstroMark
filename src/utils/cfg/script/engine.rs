@@ -1,3 +1,4 @@
+use cosmic::iced::{Color, theme::Palette};
 use rhai::{Engine, exported_module, module_resolvers::FileModuleResolver};
 
 use crate::{
@@ -5,7 +6,10 @@ use crate::{
 	utils::cfg::{flags::Flags, get_or_create_cfg_dir},
 };
 
-use super::keybinds::{Key, Keybind, modifiers};
+use super::{
+	color::{i64_to_color, palette, palettes, str_to_color},
+	keybinds::{Key, Keybind, modifiers},
+};
 
 pub fn engine() -> Engine {
 	let mut engine = Engine::new();
@@ -30,6 +34,12 @@ fn remove_features(engine: &mut Engine) {
 }
 
 fn register_types(engine: &mut Engine) {
+	macro_rules! rhai_mod {
+		($m:ident) => {
+			exported_module!($m).into()
+		};
+	}
+
 	engine
 		// Flags
 		// Store the configuration
@@ -42,11 +52,21 @@ fn register_types(engine: &mut Engine) {
 		// Keybinds
 		.build_type::<Keybind>()
 		.register_fn("keybind", Keybind::new)
-		.register_static_module("Modifier", exported_module!(modifiers).into())
+		.register_static_module("Modifier", rhai_mod!(modifiers))
 		// Menu Actions
 		// Used for "general" keybinds
 		.register_type_with_name::<MenuActions>("Action")
-		.register_static_module("Action", exported_module!(menu_actions).into());
+		.register_static_module("Action", rhai_mod!(menu_actions))
+		// Colors
+		// Used for themes
+		.register_type_with_name::<Color>("Color")
+		.register_fn("color", str_to_color)
+		.register_fn("color", i64_to_color)
+		// Palettes
+		// Also used for themes
+		.register_type_with_name::<Palette>("Palette")
+		.register_fn("palette", palette)
+		.register_static_module("Palette", rhai_mod!(palettes));
 }
 
 fn misc(engine: &mut Engine) {

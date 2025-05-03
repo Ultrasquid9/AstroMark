@@ -6,15 +6,11 @@ use cosmic::{
 	iced::{
 		Font, Length,
 		keyboard::{self, key::Named},
-		theme::Palette,
 	},
-	iced_widget::{
-		column,
-		markdown::{self, Item},
-		row, scrollable,
-	},
+	iced_widget::{column, row, scrollable},
 	widget::{
 		self, container, horizontal_space,
+		markdown::{self, Item},
 		text_editor::{self, Action, Binding, Edit},
 		vertical_space,
 	},
@@ -91,7 +87,7 @@ impl Screen for Editor {
 		let editor = widget::text_editor(&self.text)
 			.key_binding(|kp| key_bindings(kp, flags))
 			.placeholder(&self.default_text)
-			.size(flags.flags.text_size)
+			.size(flags.flags.text_size - 1.5)
 			.font(Font::MONOSPACE)
 			.highlight("markdown", flags.flags.highlight())
 			.height(Length::Fill)
@@ -102,18 +98,20 @@ impl Screen for Editor {
 			self.md.iter(),
 			markdown::Settings::with_text_size(flags.flags.text_size),
 			// TODO: Configurable Theme
-			markdown::Style::from_palette(Palette::CATPPUCCIN_FRAPPE),
+			markdown::Style::from_palette(flags.flags.palette),
 		)
 		.map(Message::Url);
 
 		row![
 			container(editor).padding(10),
-			horizontal_space().width(flags.flags.text_size),
-			scrollable(column![
-				markdown,
-				vertical_space().height(flags.flags.text_size * 10.)
-			])
-			.spacing(flags.flags.text_size)
+			row![
+				horizontal_space().width(flags.flags.text_size),
+				scrollable(column![
+					markdown,
+					vertical_space().height(flags.flags.text_size * 10.)
+				])
+				.spacing(flags.flags.text_size)
+			]
 		]
 		.into()
 	}

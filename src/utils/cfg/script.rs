@@ -6,6 +6,7 @@ use crate::utils::{AppResult, ok_or_default};
 
 use super::{DefaultBytes, flags::Flags};
 
+pub mod color;
 pub mod engine;
 pub mod keybinds;
 

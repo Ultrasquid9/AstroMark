@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use cosmic::{iced::highlighter::Theme, widget::menu};
+use cosmic::{
+	iced::{highlighter::Theme, theme::Palette},
+	widget::menu,
+};
 use rhai::{Array, CustomType, FnPtr, Map, TypeBuilder};
 use tracing::warn;
 
@@ -23,6 +26,8 @@ pub struct Flags {
 	pub expand_tabs: bool,
 	/// The highlighting theme used by the editor
 	pub highlight: String,
+	/// The palette used by the markdown renderer
+	pub palette: Palette,
 	/// Keybinds used throughout the app
 	pub general_keybinds: Array,
 	/// Function ran when starting the app
@@ -107,6 +112,7 @@ impl Default for Flags {
 			expand_tabs: false,
 			max_recents: 8,
 			highlight: "base16eighties".into(),
+			palette: Palette::CATPPUCCIN_FRAPPE,
 			callback: FnPtr::new("callback").unwrap(),
 			general_keybinds: vec![],
 		}

@@ -8,7 +8,7 @@ use cosmic::{
 };
 use cosmic_files::dialog::{DialogMessage, DialogResult};
 
-use crate::enum_mod;
+use crate::create_rhai_mod;
 
 #[derive(Debug, Clone)]
 pub enum Message {
@@ -65,12 +65,12 @@ pub fn task(message: Message) -> Task<Message> {
 	Task::done(Action::App(message))
 }
 
-enum_mod! {
-	menu_actions(MenuActions) {
-		Save,
-		SaveAs,
-		OpenFile,
-		NewFile,
-		GoHome
-	}
+create_rhai_mod! {
+	menu_actions(MenuActions) => [
+		Save;
+		SaveAs;
+		OpenFile;
+		NewFile;
+		GoHome;
+	]
 }
