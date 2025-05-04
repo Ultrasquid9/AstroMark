@@ -95,11 +95,10 @@ impl Application for AstroMark {
 
 	fn subscription(&self) -> Subscription<Self::Message> {
 		let subscriptions = vec![listen_with(|event, status, _id| match event {
+			#[rustfmt::skip]
 			Event::Keyboard(keyboard::Event::KeyPressed { key, modifiers, .. })
-				if status != Status::Captured =>
-			{
-				Some(Message::KeyPress(key, modifiers))
-			}
+				if status != Status::Captured => Some(Message::KeyPress(key, modifiers)),
+
 			_ => None,
 		})];
 

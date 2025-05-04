@@ -1,1 +1,8 @@
 hard_tabs = true
+
+# Unstable Options
+
+#fn_single_line = true
+#imports_layout = "HorizontalVertical"
+#group_imports = "StdExternalCrate"
+#trailing_semicolon = false

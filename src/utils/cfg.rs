@@ -63,8 +63,8 @@ where
 	}
 
 	pipe! [
-		file: maybe!(fs::File::open(path); "Error opening file");
-		|> bytes: maybe!(zstd::decode_all(file); "Error decoding file");
-		|> ... maybe!(bincode::deserialize(&bytes); "Error deserializing file");
+		out: maybe!(fs::File::open(path); "Error opening file");
+		|> maybe!(zstd::decode_all(out); "Error decoding file");
+		|> maybe!(bincode::deserialize(&out); "Error deserializing file");
 	]
 }

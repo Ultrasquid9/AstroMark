@@ -1,6 +1,6 @@
 use cosmic::{
 	iced_core::keyboard,
-	widget::menu::{KeyBind, key_bind::Modifier},
+	widget::menu::{KeyBind as CosmicMenuBind, key_bind::Modifier},
 };
 use rhai::{Array, CustomType, Module, TypeBuilder, export_module};
 use smol_str::SmolStr;
@@ -56,7 +56,7 @@ impl From<Key> for Option<Modifier> {
 	}
 }
 
-impl From<Keybind> for KeyBind {
+impl From<Keybind> for CosmicMenuBind {
 	fn from(bind: Keybind) -> Self {
 		Self {
 			key: bind.key.into(),

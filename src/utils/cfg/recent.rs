@@ -43,8 +43,8 @@ impl Recent {
 
 		pipe! [
 			bytes: maybe!(bincode::serialize(&self));
-			|> bytes: maybe!(zstd::bulk::compress(&bytes, 0));
-			|> ... maybe!(std::fs::write(dir, bytes));
+			|> maybe!(zstd::bulk::compress(&bytes, 0));
+			|> maybe!(std::fs::write(dir, bytes));
 		]
 	}
 
@@ -55,7 +55,13 @@ impl Recent {
 
 impl DefaultBytes for Recent {
 	fn default_bytes() -> impl AsRef<[u8]> {
-		ok_or_default(bincode::serialize(&Self::default()))
+		pipe! [
+			bytes: Self::default();
+			|> bincode::serialize(&bytes);
+			|> ok_or_default(bytes);
+			|> zstd::bulk::compress(&bytes, 0);
+			|> ok_or_default(bytes);
+		]
 	}
 }
 
