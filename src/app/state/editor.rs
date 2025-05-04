@@ -29,6 +29,7 @@ const TAB: char = '\t';
 
 pub struct Editor {
 	path: Option<PathBuf>,
+	dirty: bool,
 	default_text: String,
 	text: text_editor::Content,
 	md: Vec<Item>,
@@ -49,16 +50,15 @@ impl Editor {
 			text_editor::Content::new()
 		};
 
-		let mut editor = Self {
+		let md = markdown::parse(&text.text()).collect();
+
+		Self {
 			path,
+			dirty: false,
 			default_text: trans!("default_text"),
 			text,
-			md: vec![],
-		};
-
-		editor.parse_md();
-
-		editor
+			md,
+		}
 	}
 
 	pub fn name(&self) -> String {
@@ -69,8 +69,8 @@ impl Editor {
 		}
 	}
 
-	fn parse_md(&mut self) {
-		self.md = markdown::parse(&self.text.text()).collect()
+	pub fn can_close(&self) -> bool {
+		!self.dirty
 	}
 
 	/// Slightly hacky way to insert hard tabs
@@ -130,7 +130,8 @@ impl Screen for Editor {
 				if let Err(e) = std::fs::write(&path, self.text.text()) {
 					error!("Error when saving: {e}");
 				} else {
-					info!("File {:?} saved successfully!", path)
+					self.dirty = false;
+					info!("File {:?} saved successfully!", path);
 				}
 			}
 
@@ -149,8 +150,13 @@ impl Screen for Editor {
 				}
 
 				if is_edit {
-					self.parse_md();
+					self.dirty = true;
+					return Task::future(parse_md(self.text.text()));
 				}
+			}
+
+			Message::Parsed(md) => {
+				self.md = md;
 			}
 
 			Message::Url(url) => {
@@ -185,4 +191,8 @@ fn key_bindings(kp: text_editor::KeyPress, flags: &ScriptCfg) -> Option<Binding<
 		// Default bindings
 		Binding::from_key_press(kp)
 	}
+}
+
+async fn parse_md(text: String) -> cosmic::Action<Message> {
+	cosmic::Action::App(Message::Parsed(markdown::parse(&text).collect()))
 }

@@ -29,7 +29,10 @@ impl State {
 	}
 
 	pub fn can_overwrite(&self) -> bool {
-		matches!(self, Self::Home(_))
+		match self {
+			Self::Editor(e) => e.can_close(),
+			Self::Home(_) => true,
+		}
 	}
 
 	pub fn from_message(flags: &Flags, message: &Message) -> Option<Self> {

@@ -13,6 +13,7 @@ use crate::create_rhai_mod;
 #[derive(Debug, Clone)]
 pub enum Message {
 	Edit(text_editor::Action),
+	Parsed(Vec<markdown::Item>),
 	Url(markdown::Url),
 	Save,
 
