@@ -3,7 +3,9 @@ use std::{
 	fs,
 	path::{Path, PathBuf},
 };
-use tracing::{error, info, warn};
+use tracing::{error, info};
+
+use crate::pipe;
 
 use super::dir_exists_or_run;
 
@@ -48,17 +50,21 @@ where
 	Dir: AsRef<Path>,
 	Cfg: DeserializeOwned + Default,
 {
-	match fs::read(path) {
-		Ok(bytes) => match bincode::deserialize(&bytes) {
-			Ok(flags) => flags,
-			Err(e) => {
-				warn!("Error deserializing file: {e}");
-				Cfg::default()
+	macro_rules! maybe {
+		($in:expr; $err:literal) => {
+			match $in {
+				Ok(ok) => ok,
+				Err(e) => {
+					error!("{}: {e}", $err);
+					return Cfg::default();
+				}
 			}
-		},
-		Err(e) => {
-			error!("Error reading file: {e}");
-			Cfg::default()
-		}
+		};
 	}
+
+	pipe! [
+		file: maybe!(fs::File::open(path); "Error opening file");
+		|> bytes: maybe!(zstd::decode_all(file); "Error decoding file");
+		|> ... maybe!(bincode::deserialize(&bytes); "Error deserializing file");
+	]
 }

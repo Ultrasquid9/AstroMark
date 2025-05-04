@@ -3,7 +3,7 @@ use std::{path::PathBuf, vec::IntoIter};
 use serde::{Deserialize, Serialize};
 use tracing::error;
 
-use crate::utils::ok_or_default;
+use crate::{pipe, utils::ok_or_default};
 
 use super::{DefaultBytes, deserialize_or_default, flags::Flags, get_or_create_cfg_file};
 
@@ -27,19 +27,25 @@ impl Recent {
 	}
 
 	pub fn write(&self) {
+		macro_rules! maybe {
+			($in:expr) => {
+				match $in {
+					Ok(ok) => ok,
+					Err(e) => {
+						error!("{e}");
+						return;
+					}
+				}
+			};
+		}
+
 		let dir = get_or_create_cfg_file::<_, Self>(DIR);
 
-		let bytes = match bincode::serialize(&self) {
-			Ok(ok) => ok,
-			Err(e) => {
-				error!("{e}");
-				return;
-			}
-		};
-
-		if let Err(e) = std::fs::write(dir, bytes) {
-			error!("{e}");
-		}
+		pipe! [
+			bytes: maybe!(bincode::serialize(&self));
+			|> bytes: maybe!(zstd::bulk::compress(&bytes, 0));
+			|> ... maybe!(std::fs::write(dir, bytes));
+		]
 	}
 
 	pub fn get_inner(&self) -> &[PathBuf] {

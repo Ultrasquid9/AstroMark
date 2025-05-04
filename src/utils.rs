@@ -52,3 +52,18 @@ macro_rules! create_rhai_mod {
 		}
 	};
 }
+
+/// Pipes the first expression into any others provided
+#[macro_export]
+macro_rules! pipe {
+	(
+		$var1:ident : $in1:expr;
+		$( |> $var2:ident : $in2:expr; )*
+		|> ... $out:expr;
+	) => {{
+		let $var1 = $in1;
+		$( let $var2 = $in2; )*
+		let out = $out;
+		out
+	}};
+}
