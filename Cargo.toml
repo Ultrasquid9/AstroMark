@@ -54,6 +54,16 @@ features = [
 	"highlighter",
 ]
 
+#################### TEMP FIX ####################
+# 
+# Patches Syntect to use fancy-regex by default.
+# Remove this bit if Iced/Libcosmic/Syntect switch 
+# to it as the default, or if onig-sys is fixed.
+#
+################################################## 
+[patch.crates-io.syntect]
+git = "https://github.com/Ultrasquid9/syntect"
+
 # Remove debug info 
 # Most debugging should be done via tracing, making this (mostly) irrelevant
 [profile.dev]
