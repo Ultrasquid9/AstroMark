@@ -1,10 +1,14 @@
 use cosmic::app::{Settings, run};
-
+use tikv_jemallocator::Jemalloc;
 use utils::init;
 
 mod app;
 mod trans;
 mod utils;
+
+/// Using Jemalloc instead of the default (glibc) allocator
+#[global_allocator]
+static ALLOC: Jemalloc = Jemalloc;
 
 fn main() -> utils::AppResult<()> {
 	trans::init()?;

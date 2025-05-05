@@ -10,6 +10,8 @@ dirs = "6"
 open = "5.3"
 smol_str = "0.2.2"
 
+tikv-jemallocator = "0.6"
+
 # (de)serialization
 zstd = "0.13"
 bincode = "1.3"
