@@ -28,19 +28,22 @@ pub mod dialog;
 pub mod message;
 pub mod state;
 
+/// Anything that can be rendered as a page in a tab
 pub trait Screen {
-	fn view<'flags>(&'flags self, flags: &'flags ScriptCfg) -> Element<'flags, Message>;
+	/// Renders the [Screen].
+	///
+	/// The `'cfg` lifetime ensures that the [ScriptCfg] lasts as long as the [Screen] does.
+	fn view<'cfg>(&'cfg self, cfg: &'cfg ScriptCfg) -> Element<'cfg, Message>;
 
-	fn update<'flags>(
-		&'flags mut self,
-		flags: &'flags mut ScriptCfg,
-		message: Message,
-	) -> Task<Message>;
+	/// Updates the [Screen].
+	///
+	/// The `'cfg` lifetime ensures that the [ScriptCfg] lasts as long as the [Screen] does.
+	fn update<'cfg>(&'cfg mut self, flags: &'cfg mut ScriptCfg, message: Message) -> Task<Message>;
 }
 
 pub struct AstroMark {
 	core: Core,
-	flags: ScriptCfg,
+	cfg: ScriptCfg,
 
 	model: Model<SingleSelect>,
 	tabs: HashMap<Entity, State>,
@@ -65,7 +68,7 @@ impl Application for AstroMark {
 	fn init(core: Core, flags: Self::Flags) -> (Self, Task<Self::Message>) {
 		let mut app = Self {
 			core,
-			flags,
+			cfg: flags,
 
 			model: Model::builder().build(),
 			tabs: HashMap::default(),
@@ -110,7 +113,7 @@ impl Application for AstroMark {
 			return column![].into();
 		};
 
-		let mut children = vec![state.view(&self.flags)];
+		let mut children = vec![state.view(&self.cfg)];
 
 		if self.tabs.len() > 1 {
 			children.insert(
@@ -143,7 +146,7 @@ impl Application for AstroMark {
 		];
 
 		if let Some(state) = self.tabs.get_mut(&self.model.active()) {
-			state.update(&mut self.flags, message.clone())
+			state.update(&mut self.cfg, message.clone())
 		} else {
 			Task::none()
 		}
@@ -159,6 +162,8 @@ impl AstroMark {
 	}
 
 	fn update_tabs(&mut self, message: &Message) {
+		let active = self.model.active();
+
 		match message {
 			Message::SwitchToTab(id) => {
 				self.model.activate(*id);
@@ -166,7 +171,7 @@ impl AstroMark {
 			}
 			Message::KillTab(id) => {
 				// If the currently active tab is the one being closed, switch to a different one
-				if self.model.active() == *id {
+				if active == *id {
 					// Ensuring that you are being sent to a tab that isn't being closed
 					let to_activate = match self.model.position(*id) {
 						Some(0) => 1,
@@ -182,14 +187,15 @@ impl AstroMark {
 			_ => (),
 		}
 
-		if let Some(new) = State::from_message(&self.flags.flags, message) {
-			if matches!(self.tabs.get(&self.model.active()), Some(state) if state.can_overwrite()) {
-				let id = self.model.active();
-
-				self.tabs.remove(&id);
-				self.model.remove(id);
-			}
+		if let Some(new) = State::from_message(&self.cfg.flags, message) {
 			self.add_tab(new);
+
+			if matches!(self.tabs.get(&active), Some(state) if state.can_overwrite(message)) {
+				self.model.position_swap(self.model.active(), active);
+
+				self.tabs.remove(&active);
+				self.model.remove(active);
+			}
 		}
 	}
 
@@ -216,12 +222,13 @@ impl AstroMark {
 			Item::Button(trans!("open_file"), None, MenuActions::OpenFile),
 			Item::Button(trans!("new_file"), None, MenuActions::NewFile),
 			Item::Divider,
+			Item::Button(trans!("new_tab"), None, MenuActions::NewTab),
 			Item::Button(trans!("go_home"), None, MenuActions::GoHome),
 		]);
 
 		menu::bar(vec![menu::Tree::with_children(
 			menu::root(trans!("file")),
-			menu::items(&self.flags.flags.general_keybinds(), file_menu),
+			menu::items(&self.cfg.flags.general_keybinds(), file_menu),
 		)])
 		.item_height(ItemHeight::Dynamic(40))
 		.into()
@@ -229,7 +236,7 @@ impl AstroMark {
 
 	fn keybinds(&self, message: &Message) -> Option<Task<Message>> {
 		if let Message::KeyPress(key, modifiers) = message {
-			for (keybind, action) in self.flags.flags.general_keybinds() {
+			for (keybind, action) in self.cfg.flags.general_keybinds() {
 				if keybind.matches(*modifiers, key) {
 					return Some(task(action.into()));
 				}

@@ -83,44 +83,40 @@ impl Editor {
 }
 
 impl Screen for Editor {
-	fn view<'flags>(&'flags self, flags: &'flags ScriptCfg) -> Element<'flags, Message> {
+	fn view<'cfg>(&'cfg self, cfg: &'cfg ScriptCfg) -> Element<'cfg, Message> {
 		let editor = widget::text_editor(&self.text)
-			.key_binding(|kp| key_bindings(kp, flags))
+			.key_binding(|kp| key_bindings(kp, cfg))
 			.placeholder(&self.default_text)
-			.size(flags.flags.text_size - 1.5)
+			.size(cfg.flags.text_size - 1.5)
 			.font(Font::MONOSPACE)
-			.highlight("markdown", flags.flags.highlight())
+			.highlight("markdown", cfg.flags.highlight())
 			.height(Length::Fill)
 			.padding(10)
 			.on_action(Message::Edit);
 
 		let markdown = markdown::view(
 			self.md.iter(),
-			markdown::Settings::with_text_size(flags.flags.text_size),
+			markdown::Settings::with_text_size(cfg.flags.text_size),
 			// TODO: Configurable Theme
-			markdown::Style::from_palette(flags.flags.palette),
+			markdown::Style::from_palette(cfg.flags.palette),
 		)
 		.map(Message::Url);
 
 		row![
 			container(editor).padding(10),
 			row![
-				horizontal_space().width(flags.flags.text_size),
+				horizontal_space().width(cfg.flags.text_size),
 				scrollable(column![
 					markdown,
-					vertical_space().height(flags.flags.text_size * 10.)
+					vertical_space().height(cfg.flags.text_size * 10.)
 				])
-				.spacing(flags.flags.text_size)
+				.spacing(cfg.flags.text_size)
 			]
 		]
 		.into()
 	}
 
-	fn update<'flags>(
-		&'flags mut self,
-		_: &'flags mut ScriptCfg,
-		message: Message,
-	) -> Task<Message> {
+	fn update<'cfg>(&'cfg mut self, _: &'cfg mut ScriptCfg, message: Message) -> Task<Message> {
 		match message {
 			Message::Save => {
 				let Some(path) = self.path.clone() else {

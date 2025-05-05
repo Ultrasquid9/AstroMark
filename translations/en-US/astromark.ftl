@@ -13,4 +13,5 @@ default_text = Type Here
 file = File
 save = Save
 save_as = Save As
+new_tab = New Tab
 go_home = Go Home

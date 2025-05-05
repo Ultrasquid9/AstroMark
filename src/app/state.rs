@@ -28,26 +28,37 @@ impl State {
 		Self::Home(home::Home::new())
 	}
 
-	pub fn can_overwrite(&self) -> bool {
-		match self {
-			Self::Editor(e) => e.can_close(),
-			Self::Home(_) => true,
+	/// Checks if the current [State] should be overwritten by a new one
+	pub fn can_overwrite(&self, message: &Message) -> bool {
+		if matches!(message, Message::NewTab) {
+			false
+		} else {
+			match self {
+				Self::Editor(e) => e.can_close(),
+				Self::Home(_) => true,
+			}
 		}
 	}
 
+	/// Creates a [State] from a [Message]
+	///
+	/// Both [Message::OpenHome] and [Message::NewTab] do the same thing.
+	/// To determine what to do with the result, use [State::can_overwrite].
 	pub fn from_message(flags: &Flags, message: &Message) -> Option<Self> {
 		match message {
 			Message::OpenEditor(path) => Some(Self::editor(flags, path)),
-			Message::OpenHome => Some(Self::home()),
+			Message::OpenHome | Message::NewTab => Some(Self::home()),
 
 			_ => None,
 		}
 	}
 
+	/// Creates a [State::Home]
 	fn home() -> Self {
 		Self::Home(home::Home::new())
 	}
 
+	/// Creates a [State::Editor], reading from the provided file if it exists
 	fn editor(flags: &Flags, path: &Option<PathBuf>) -> Self {
 		if let Some(path) = path {
 			let mut recent = Recent::read(get_or_create_cfg_file::<_, Recent>(recent::DIR));
@@ -60,24 +71,20 @@ impl State {
 }
 
 impl Screen for State {
-	fn view<'flags>(&'flags self, flags: &'flags ScriptCfg) -> Element<'flags, Message> {
+	fn view<'cfg>(&'cfg self, cfg: &'cfg ScriptCfg) -> Element<'cfg, Message> {
 		let screen: &dyn Screen = match self {
 			Self::Editor(editor) => editor,
 			Self::Home(home) => home,
 		};
-		screen.view(flags)
+		screen.view(cfg)
 	}
 
-	fn update<'flags>(
-		&'flags mut self,
-		flags: &'flags mut ScriptCfg,
-		message: Message,
-	) -> Task<Message> {
+	fn update<'cfg>(&'cfg mut self, cfg: &'cfg mut ScriptCfg, message: Message) -> Task<Message> {
 		let screen: &mut dyn Screen = match self {
 			Self::Editor(editor) => editor,
 			Self::Home(home) => home,
 		};
-		screen.update(flags, message)
+		screen.update(cfg, message)
 	}
 }
 

@@ -29,6 +29,7 @@ pub enum Message {
 
 	OpenEditor(Option<PathBuf>),
 	OpenHome,
+	NewTab,
 	SwitchToTab(Entity),
 	KillTab(Entity),
 }
@@ -39,6 +40,7 @@ pub enum MenuActions {
 	SaveAs,
 	OpenFile,
 	NewFile,
+	NewTab,
 	GoHome,
 }
 
@@ -49,6 +51,7 @@ impl From<MenuActions> for Message {
 			MenuActions::SaveAs => Self::SaveAsFilePicker,
 			MenuActions::OpenFile => Self::OpenFilePicker,
 			MenuActions::NewFile => Self::OpenEditor(None),
+			MenuActions::NewTab => Self::NewTab,
 			MenuActions::GoHome => Self::OpenHome,
 		}
 	}
@@ -72,6 +75,7 @@ create_rhai_mod! {
 		SaveAs;
 		OpenFile;
 		NewFile;
+		NewTab;
 		GoHome;
 	]
 }
