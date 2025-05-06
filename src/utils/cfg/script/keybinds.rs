@@ -41,18 +41,16 @@ impl From<Key> for keyboard::Key {
 
 impl From<Key> for Option<Modifier> {
 	fn from(key: Key) -> Self {
-		if key == modifiers::SUPER {
-			Some(Modifier::Super)
-		} else if key == modifiers::CTRL {
-			Some(Modifier::Ctrl)
-		} else if key == modifiers::ALT {
-			Some(Modifier::Alt)
-		} else if key == modifiers::SHIFT {
-			Some(Modifier::Shift)
-		} else {
-			warn!("{} is not a modifier!", key.0);
-			None
-		}
+		Some(match () {
+			_ if key == modifiers::Super => Modifier::Super,
+			_ if key == modifiers::Ctrl => Modifier::Ctrl,
+			_ if key == modifiers::Alt => Modifier::Alt,
+			_ if key == modifiers::Shift => Modifier::Shift,
+			_ => {
+				warn!("{} is not a modifier!", key.0);
+				return None;
+			}
+		})
 	}
 }
 
@@ -71,14 +69,17 @@ impl From<Keybind> for CosmicMenuBind {
 
 #[export_module]
 pub mod modifiers {
-	use super::Key;
-
-	const fn key(str: &'static str) -> Key {
-		Key(smol_str::SmolStr::new_static(str))
+	macro_rules! keys {
+		( $( $name:ident : $str:literal ; )* ) => { $(
+			#[allow(non_upper_case_globals)]
+			pub const $name: super::Key = super::Key(smol_str::SmolStr::new_static($str));
+		)* };
 	}
 
-	pub const SUPER: Key = key("Super");
-	pub const CTRL: Key = key("Ctrl");
-	pub const ALT: Key = key("Alt");
-	pub const SHIFT: Key = key("Shift");
+	keys! {
+		Super: "Super";
+		Ctrl: "Ctrl";
+		Alt: "Alt";
+		Shift: "Shift";
+	}
 }
