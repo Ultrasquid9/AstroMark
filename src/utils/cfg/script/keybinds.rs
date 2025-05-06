@@ -2,9 +2,11 @@ use cosmic::{
 	iced_core::keyboard,
 	widget::menu::{KeyBind as CosmicMenuBind, key_bind::Modifier},
 };
-use rhai::{Array, CustomType, Module, TypeBuilder, export_module};
+use rhai::{Array, CustomType, TypeBuilder};
 use smol_str::SmolStr;
 use tracing::warn;
+
+use crate::create_rhai_mod;
 
 #[derive(PartialEq, Clone, CustomType)]
 pub struct Key(pub SmolStr);
@@ -67,19 +69,20 @@ impl From<Keybind> for CosmicMenuBind {
 	}
 }
 
-#[export_module]
-pub mod modifiers {
-	macro_rules! keys {
-		( $( $name:ident : $str:literal ; )* ) => { $(
+// Macros are expanded outwards -> inwards.
+// Therefore, the entire module must be created within the macro.
+macro_rules! keys {
+	( $( $name:ident , )* ) => {
+		create_rhai_mod! { modifiers { $(
 			#[allow(non_upper_case_globals)]
-			pub const $name: super::Key = super::Key(smol_str::SmolStr::new_static($str));
-		)* };
-	}
+			pub const $name: super::Key = super::Key(smol_str::SmolStr::new_static(stringify!($name)));
+		)* } }
+	};
+}
 
-	keys! {
-		Super: "Super";
-		Ctrl: "Ctrl";
-		Alt: "Alt";
-		Shift: "Shift";
-	}
+keys! {
+	Super,
+	Ctrl,
+	Alt,
+	Shift,
 }
