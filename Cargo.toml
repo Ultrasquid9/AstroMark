@@ -72,4 +72,4 @@ strip = "debuginfo"
 
 # Build dependencies with high optimization
 [profile.dev.package."*"]
-opt-level = 3
+opt-level = 2

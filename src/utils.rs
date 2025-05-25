@@ -37,10 +37,10 @@ where
 	}
 }
 
-/// Creates a module and automatically exports it to Rhai. Includes 
-/// a higher-level API for creating constants for Enum variants, and 
-/// a lower-level API for creating modules manually. 
-/// 
+/// Creates a module and automatically exports it to Rhai. Includes
+/// a higher-level API for creating constants for Enum variants, and
+/// a lower-level API for creating modules manually.
+///
 /// # Examples
 /// Using the Enum API:
 /// ```
@@ -49,7 +49,7 @@ where
 /// 	Variant2,
 /// 	Variant3,
 /// }
-/// 
+///
 /// create_rhai_mod! {
 /// 	my_enum(MyEnum) => [
 /// 		Variant1,
@@ -58,8 +58,8 @@ where
 /// 	]
 /// }
 /// ```
-/// Using the lower-level API: 
-/// ``` 
+/// Using the lower-level API:
+/// ```
 /// create_rhai_mod! {
 /// 	my_mod {
 /// 		// Functions/Constants go here
@@ -84,7 +84,7 @@ macro_rules! create_rhai_mod {
 }
 
 /// Pipes the first expression into any others provided.
-/// 
+///
 /// # Examples
 /// ```
 /// # fn add_one(i: i32) -> i32 { i + 1 }
@@ -96,7 +96,7 @@ macro_rules! create_rhai_mod {
 /// 	|> divide_by_two(my_var);
 /// 	|> my_var.to_string();
 /// }
-/// 
+///
 /// assert_eq!("62", string);
 /// ```
 #[macro_export]

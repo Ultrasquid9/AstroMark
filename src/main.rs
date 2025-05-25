@@ -1,3 +1,5 @@
+#![allow(clippy::tabs_in_doc_comments)]
+
 use cosmic::app::{Settings, run};
 use tikv_jemallocator::Jemalloc;
 use utils::init;

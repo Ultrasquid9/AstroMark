@@ -84,6 +84,8 @@ impl Editor {
 
 impl Screen for Editor {
 	fn view<'cfg>(&'cfg self, cfg: &'cfg ScriptCfg) -> Element<'cfg, Message> {
+		let space = horizontal_space().width(cfg.flags.text_size);
+
 		let editor = widget::text_editor(&self.text)
 			.key_binding(|kp| key_bindings(kp, cfg))
 			.placeholder(&self.default_text)
@@ -97,7 +99,6 @@ impl Screen for Editor {
 		let markdown = markdown::view(
 			self.md.iter(),
 			markdown::Settings::with_text_size(cfg.flags.text_size),
-			// TODO: Configurable Theme
 			markdown::Style::from_palette(cfg.flags.palette),
 		)
 		.map(Message::Url);
@@ -105,11 +106,13 @@ impl Screen for Editor {
 		row![
 			container(editor).padding(10),
 			row![
-				horizontal_space().width(cfg.flags.text_size),
+				space,
 				scrollable(column![
 					markdown,
 					vertical_space().height(cfg.flags.text_size * 10.)
 				])
+				.width(Length::Fill)
+				.height(Length::Fill)
 				.spacing(cfg.flags.text_size)
 			]
 		]
